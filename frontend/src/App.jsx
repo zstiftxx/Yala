@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import Login from './Login.jsx';
+import Dashboard from './Dashboard.jsx';
 import './App.css';
 
 const cursosDePrueba = [
@@ -116,7 +117,7 @@ function App() {
       {/* Mostrar página de login en la raíz */}
       <Route path="/" element={<Login />} />
       {/* Después de iniciar sesión, redirigir aquí */}
-      <Route path="/home" element={<PaginaInicio />} />
+      <Route path="/home" element={<Dashboard />} />
       <Route path="/curso" element={<PaginaCurso />} />
     </Routes>
   );
