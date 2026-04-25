@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
+import { supabase } from './supabaseClient';
+import Login from './Login.jsx';
 import './App.css';
 
 const cursosDePrueba = [
@@ -12,8 +14,19 @@ const cursosDePrueba = [
 ];
 
 function PaginaInicio() {
+  const navigate = useNavigate();
   const [busqueda, setBusqueda] = useState('');
   const [resultados, setResultados] = useState([]); 
+
+  const manejarLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      // ignore
+    }
+    localStorage.removeItem('user');
+    navigate('/');
+  };
 
   const manejarBusqueda = () => {
     const cursosEncontrados = cursosDePrueba.filter(curso => 
@@ -30,6 +43,9 @@ function PaginaInicio() {
       </header>
 
       <main>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 20px' }}>
+          <button onClick={manejarLogout} style={{ padding: '6px 12px', cursor: 'pointer' }}>Cerrar sesión</button>
+        </div>
         <section>
           <h2>Busca tu curso</h2>
           <input 
@@ -84,15 +100,25 @@ function PaginaCurso() {
 
 // 5. Nuestro componente principal ahora administra las rutas (caminos)
 function App() {
+  // Componente simple para proteger rutas: redirige al login si no hay user
+  function RequireAuth({ children }) {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) return <Navigate to="/" replace />;
+      return children;
+    } catch (err) {
+      return <Navigate to="/" replace />;
+    }
+  }
+
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Si la URL es "/", muestra el buscador */}
-        <Route path="/" element={<PaginaInicio />} />
-        {/* Si la URL es "/curso", muestra la nueva página */}
-        <Route path="/curso" element={<PaginaCurso />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      {/* Mostrar página de login en la raíz */}
+      <Route path="/" element={<Login />} />
+      {/* Después de iniciar sesión, redirigir aquí */}
+      <Route path="/home" element={<PaginaInicio />} />
+      <Route path="/curso" element={<PaginaCurso />} />
+    </Routes>
   );
 }
 
