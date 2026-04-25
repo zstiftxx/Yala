@@ -99,9 +99,7 @@ function PaginaCurso() {
   );
 }
 
-// 5. Nuestro componente principal ahora administra las rutas (caminos)
 function App() {
-  // Componente simple para proteger rutas: redirige al login si no hay user
   function RequireAuth({ children }) {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
