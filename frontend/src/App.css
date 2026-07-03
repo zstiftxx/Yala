@@ -218,9 +218,18 @@
 .course-title { font-weight:600 }
 .course-meta { font-size:12px; opacity:0.75 }
 .completed { grid-column:1 / 2 }
-.upcoming { grid-column:2 / 3 }
 .list { display:flex; flex-direction:column; gap:10px }
 .list-item { background:rgba(255,255,255,0.02); padding:12px; border-radius:8px }
+
+.course-item-check, .list-item-check { display:flex; align-items:center; gap:10px; cursor:pointer }
+.course-item-check input, .list-item-check input { width:16px; height:16px; flex-shrink:0; cursor:pointer }
+
+.malla-grid { display:flex; gap:14px; overflow-x:auto; padding-bottom:12px }
+.malla-columna { min-width:200px; display:flex; flex-direction:column; gap:10px }
+.malla-columna h4 { margin:0 0 4px; color:var(--text-h); text-align:center }
+.malla-curso { padding:12px; border-radius:8px; font-size:13px; font-weight:600; text-align:center; border:1px solid transparent }
+.malla-curso.aprobado { background:#162e2a; border-color:#2f6f5e; color:#8ef0d0 }
+.malla-curso.no-cursado { background:rgba(255,255,255,0.02); color:var(--text-h) }
 
 @media (max-width: 900px) {
   .dashboard-root { flex-direction:column }

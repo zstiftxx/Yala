@@ -3,6 +3,7 @@ import Login from './Login.jsx';
 import Dashboard from './Dashboard.jsx';
 import SeleccionCarrera from './SeleccionCarrera.jsx';
 import Perfil from './Perfil.jsx';
+import MapaCurricular from './MapaCurricular.jsx';
 import './App.css';
 
 function RequireAuth({ children }) {
@@ -38,6 +39,7 @@ function App() {
       <Route path="/carrera" element={<RequireAuth><SeleccionCarrera /></RequireAuth>} />
       <Route path="/home" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/perfil" element={<RequireAuth><Perfil /></RequireAuth>} />
+      <Route path="/mapa-curricular" element={<RequireAuth><MapaCurricular /></RequireAuth>} />
       <Route path="/curso" element={<RequireAuth><PaginaCurso /></RequireAuth>} />
     </Routes>
   );

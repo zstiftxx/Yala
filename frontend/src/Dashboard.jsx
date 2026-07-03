@@ -1,12 +1,50 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from './supabaseClient';
 import { cursosGeneralesPorCarrera } from './data/cursosGenerales';
 import Sidebar from './Sidebar.jsx';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const usuarioGuardado = JSON.parse(localStorage.getItem('user') || 'null');
   const carrera = usuarioGuardado?.user_metadata?.carrera || 'Tu carrera';
-  const nombre = usuarioGuardado?.user_metadata?.nombre || '';
+  const nombreUsuario = usuarioGuardado?.user_metadata?.nombre || '';
   const cursosGenerales = cursosGeneralesPorCarrera[carrera];
-  const inicialAvatar = (nombre || usuarioGuardado?.email || '?').charAt(0).toUpperCase();
+  const inicialAvatar = (nombreUsuario || usuarioGuardado?.email || '?').charAt(0).toUpperCase();
+
+  const [cursosAprobados, setCursosAprobados] = useState(
+    usuarioGuardado?.user_metadata?.cursosAprobados || []
+  );
+
+  const todosLosCursos = cursosGenerales ? [...cursosGenerales[1], ...cursosGenerales[2]] : [];
+  const totalCursos = todosLosCursos.length;
+  const aprobadosCount = cursosAprobados.filter((c) => todosLosCursos.includes(c)).length;
+  const progreso = totalCursos > 0 ? Math.round((aprobadosCount / totalCursos) * 100) : 0;
+
+  const alternarCurso = async (curso) => {
+    const anterior = cursosAprobados;
+    const nuevo = anterior.includes(curso)
+      ? anterior.filter((c) => c !== curso)
+      : [...anterior, curso];
+
+    setCursosAprobados(nuevo);
+
+    const { data, error } = await supabase.auth.updateUser({
+      data: { cursosAprobados: nuevo },
+    });
+
+    if (error) {
+      if (error.message.toLowerCase().includes('session')) {
+        localStorage.removeItem('user');
+        navigate('/');
+        return;
+      }
+      setCursosAprobados(anterior); // revertir si falló el guardado
+      return;
+    }
+
+    localStorage.setItem('user', JSON.stringify(data.user));
+  };
 
   return (
     <div className="dashboard-root">
@@ -17,7 +55,7 @@ export default function Dashboard() {
           <h1>{carrera}</h1>
           <div className="top-actions">
             <button className="btn ghost">Actualizar cursos</button>
-            <button className="btn primary">Ver mapa curricular</button>
+            <button className="btn primary" onClick={() => navigate('/mapa-curricular')}>Ver mapa curricular</button>
             <div className="avatar">{inicialAvatar}</div>
           </div>
         </header>
@@ -25,19 +63,11 @@ export default function Dashboard() {
         <section className="overview">
           <div className="stat-card progress">
             <div className="label">Progreso</div>
-            <div className="value">15%</div>
+            <div className="value">{progreso}%</div>
           </div>
           <div className="stat-card green">
             <div className="label">Aprobados</div>
-            <div className="value">11/74</div>
-          </div>
-          <div className="stat-card blue">
-            <div className="label">En curso</div>
-            <div className="value">6</div>
-          </div>
-          <div className="stat-card muted">
-            <div className="label">Créditos</div>
-            <div className="value">37/250</div>
+            <div className="value">{aprobadosCount}/{totalCursos}</div>
           </div>
         </section>
 
@@ -47,10 +77,15 @@ export default function Dashboard() {
               <div className="card courses">
                 <h3>Cursos Generales · Ciclo 1</h3>
                 <div className="course-grid">
-                  {cursosGenerales[1].map((nombre) => (
-                    <div key={nombre} className="course-item">
-                      <div className="course-title">{nombre}</div>
-                    </div>
+                  {cursosGenerales[1].map((curso) => (
+                    <label key={curso} className="course-item course-item-check">
+                      <input
+                        type="checkbox"
+                        checked={cursosAprobados.includes(curso)}
+                        onChange={() => alternarCurso(curso)}
+                      />
+                      <div className="course-title">{curso}</div>
+                    </label>
                   ))}
                 </div>
               </div>
@@ -58,8 +93,15 @@ export default function Dashboard() {
               <div className="card completed">
                 <h3>Cursos Generales · Ciclo 2</h3>
                 <div className="list">
-                  {cursosGenerales[2].map((nombre) => (
-                    <div key={nombre} className="list-item">{nombre}</div>
+                  {cursosGenerales[2].map((curso) => (
+                    <label key={curso} className="list-item list-item-check">
+                      <input
+                        type="checkbox"
+                        checked={cursosAprobados.includes(curso)}
+                        onChange={() => alternarCurso(curso)}
+                      />
+                      {curso}
+                    </label>
                   ))}
                 </div>
               </div>
