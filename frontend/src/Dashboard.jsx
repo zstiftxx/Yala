@@ -1,26 +1,19 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
+import { cursosGeneralesPorCarrera } from './data/cursosGenerales';
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const usuarioGuardado = JSON.parse(localStorage.getItem('user') || 'null');
+  const carrera = usuarioGuardado?.user_metadata?.carrera || 'Tu carrera';
+  const cursosGenerales = cursosGeneralesPorCarrera[carrera];
 
   const manejarLogout = async () => {
     try { await supabase.auth.signOut(); } catch (e) {}
     localStorage.removeItem('user');
     navigate('/');
   };
-
-  const cursosProgreso = [
-    { id: 1, nombre: 'Álgebra Lineal', codigo: '6384', ciclo: '2', creditos: 3 },
-    { id: 2, nombre: 'Física para Sistemas', codigo: '650053', ciclo: '3', creditos: 4 },
-    { id: 3, nombre: 'Inteligencia Artificial Aplicada', codigo: '560040', ciclo: '3', creditos: 3 },
-    { id: 4, nombre: 'Introducción a la Programación', codigo: '650054', ciclo: '3', creditos: 4 }
-  ];
-
-  const cursosCompletados = [
-    'Cálculo I', 'Matemática para la Gestión de Negocios', 'Precálculo', 'Álgebra Lineal'
-  ];
 
   return (
     <div className="dashboard-root">
@@ -42,7 +35,7 @@ export default function Dashboard() {
 
       <main className="main-area">
         <header className="topbar">
-          <h1>Ingeniería de Sistemas</h1>
+          <h1>{carrera}</h1>
           <div className="top-actions">
             <button className="btn ghost">Actualizar cursos</button>
             <button className="btn primary">Ver mapa curricular</button>
@@ -70,33 +63,34 @@ export default function Dashboard() {
         </section>
 
         <section className="cards">
-          <div className="card courses">
-            <h3>Cursos en progreso</h3>
-            <div className="course-grid">
-              {cursosProgreso.map(c => (
-                <div key={c.id} className="course-item">
-                  <div className="course-title">{c.nombre}</div>
-                  <div className="course-meta">{c.codigo} · Ciclo {c.ciclo} · {c.creditos} cr.</div>
+          {cursosGenerales ? (
+            <>
+              <div className="card courses">
+                <h3>Cursos Generales · Ciclo 1</h3>
+                <div className="course-grid">
+                  {cursosGenerales[1].map((nombre) => (
+                    <div key={nombre} className="course-item">
+                      <div className="course-title">{nombre}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="card completed">
-            <h3>Curso Completado</h3>
-            <div className="list">
-              {cursosCompletados.map((t, i) => (
-                <div key={i} className="list-item">{t}</div>
-              ))}
+              <div className="card completed">
+                <h3>Cursos Generales · Ciclo 2</h3>
+                <div className="list">
+                  {cursosGenerales[2].map((nombre) => (
+                    <div key={nombre} className="list-item">{nombre}</div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="card courses">
+              <h3>Cursos Generales</h3>
+              <p>Selecciona tu carrera para ver los cursos generales que te corresponden.</p>
             </div>
-          </div>
-
-          <div className="card upcoming">
-            <h3>Curso Próximamente</h3>
-            <div className="list">
-              <div className="list-item">Cálculo II</div>
-            </div>
-          </div>
+          )}
         </section>
       </main>
     </div>

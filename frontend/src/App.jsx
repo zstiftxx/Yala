@@ -1,6 +1,7 @@
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Login from './Login.jsx';
 import Dashboard from './Dashboard.jsx';
+import SeleccionCarrera from './SeleccionCarrera.jsx';
 import './App.css';
 
 function RequireAuth({ children }) {
@@ -33,6 +34,7 @@ function App() {
       {/* Mostrar página de login en la raíz */}
       <Route path="/" element={<Login />} />
       {/* Después de iniciar sesión, redirigir aquí */}
+      <Route path="/carrera" element={<RequireAuth><SeleccionCarrera /></RequireAuth>} />
       <Route path="/home" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/curso" element={<RequireAuth><PaginaCurso /></RequireAuth>} />
     </Routes>

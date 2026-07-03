@@ -9,6 +9,8 @@ function Login() {
   const [mensaje, setMensaje] = useState('');
   const navigate = useNavigate();
 
+  const destinoSegunUsuario = (user) => (user?.user_metadata?.carrera ? '/home' : '/carrera');
+
   // Esta función se activa al hacer clic en el botón
   const manejarRegistro = async (e) => {
     e.preventDefault(); // Evita que la página se recargue
@@ -23,13 +25,14 @@ function Login() {
     // Si Supabase nos devuelve un error, lo mostramos
     if (error) {
       setMensaje('Error: ' + error.message);
+    } else if (data && data.session) {
+      // Solo hay sesión real si la confirmación por correo está desactivada
+      setMensaje('¡Registro exitoso!');
+      localStorage.setItem('user', JSON.stringify(data.user));
+      navigate(destinoSegunUsuario(data.user));
     } else {
-      setMensaje('¡Registro exitoso! Por favor revisa la bandeja de tu correo para confirmar.');
-      // Si el registro devuelve usuario, podemos redirigir directamente
-      if (data && data.user) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/home');
-      }
+      // Sin sesión: el proyecto exige confirmar el correo antes de poder ingresar
+      setMensaje('¡Registro exitoso! Revisa tu correo para confirmar tu cuenta y luego inicia sesión.');
     }
   };
 
@@ -48,7 +51,7 @@ function Login() {
     } else if (data && data.user) {
       setMensaje('¡Ingreso exitoso! Redirigiendo...');
       localStorage.setItem('user', JSON.stringify(data.user));
-      navigate('/home');
+      navigate(destinoSegunUsuario(data.user));
     } else {
       setMensaje('Ingreso completado.');
     }
