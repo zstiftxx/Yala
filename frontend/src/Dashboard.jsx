@@ -1,37 +1,16 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
 import { cursosGeneralesPorCarrera } from './data/cursosGenerales';
+import Sidebar from './Sidebar.jsx';
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const usuarioGuardado = JSON.parse(localStorage.getItem('user') || 'null');
   const carrera = usuarioGuardado?.user_metadata?.carrera || 'Tu carrera';
+  const nombre = usuarioGuardado?.user_metadata?.nombre || '';
   const cursosGenerales = cursosGeneralesPorCarrera[carrera];
-
-  const manejarLogout = async () => {
-    try { await supabase.auth.signOut(); } catch (e) {}
-    localStorage.removeItem('user');
-    navigate('/');
-  };
+  const inicialAvatar = (nombre || usuarioGuardado?.email || '?').charAt(0).toUpperCase();
 
   return (
     <div className="dashboard-root">
-      <aside className="sidebar">
-        <div className="brand">Educateca</div>
-        <nav>
-          <ul>
-            <li className="active">Dashboard</li>
-            <li>Notificaciones</li>
-            <li>Mis Cursos</li>
-            <li>Feedback</li>
-            <li>Perfil</li>
-          </ul>
-        </nav>
-        <div className="sidebar-bottom">
-          <button className="logout" onClick={manejarLogout}>Cerrar sesión</button>
-        </div>
-      </aside>
+      <Sidebar active="dashboard" />
 
       <main className="main-area">
         <header className="topbar">
@@ -39,7 +18,7 @@ export default function Dashboard() {
           <div className="top-actions">
             <button className="btn ghost">Actualizar cursos</button>
             <button className="btn primary">Ver mapa curricular</button>
-            <div className="avatar">T</div>
+            <div className="avatar">{inicialAvatar}</div>
           </div>
         </header>
 
