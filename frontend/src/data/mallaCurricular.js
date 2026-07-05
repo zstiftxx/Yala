@@ -1,8 +1,12 @@
 import { cursosGeneralesPorCarrera } from './cursosGenerales';
+import { cursosAvanzadosGenerados, prerequisitosGenerados } from './mallasGeneradas';
 
 // Ciclos 3 en adelante, por carrera. Ciclos 1 y 2 se toman de cursosGenerales.js
 // (misma fuente que usa el Dashboard) para no duplicar esa data.
+// Ingeniería de Sistemas se define a mano; el resto se importa de mallasGeneradas.js
+// (extraído de los planes de estudio oficiales en PDF).
 const cursosAvanzadosPorCarrera = {
+  ...cursosAvanzadosGenerados,
   'Ingeniería de Sistemas': {
     3: [
       'Cálculo II',
@@ -67,6 +71,7 @@ const cursosAvanzadosPorCarrera = {
 // antes). Solo se listan los cursos que tienen algún prerrequisito.
 // Fuente: Plan de estudios 2026-1 de la Universidad de Lima.
 const prerequisitosPorCarrera = {
+  ...prerequisitosGenerados,
   'Ingeniería de Sistemas': {
     'Lenguaje y Comunicación II': ['Lenguaje y Comunicación I'],
     'Álgebra Lineal': ['Precálculo'],
