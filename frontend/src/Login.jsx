@@ -1,94 +1,139 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Importamos la "tubería" que creaste con Claude
-import { supabase } from './supabaseClient'; 
+import { GraduationCap, Mail, Lock, Eye, EyeOff, LogIn, Moon, Sun } from 'lucide-react';
+// Importamos la "tuberia" que creaste con Claude
+import { supabase } from './supabaseClient';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [mensaje, setMensaje] = useState('');
+  const [mensaje, setMensaje] = useState(null); // { tipo: 'error'|'success'|'info', texto }
+  const [cargando, setCargando] = useState(false);
+  const [verPass, setVerPass] = useState(false);
+  const [tema, setTema] = useState(localStorage.getItem('tema') || 'light');
   const navigate = useNavigate();
+
+  const alternarTema = () => {
+    const nuevo = tema === 'light' ? 'dark' : 'light';
+    setTema(nuevo);
+    localStorage.setItem('tema', nuevo);
+  };
 
   const destinoSegunUsuario = (user) => (user?.user_metadata?.carrera ? '/home' : '/carrera');
 
-  // Esta función se activa al hacer clic en el botón
+  // Registro (sign up)
   const manejarRegistro = async (e) => {
-    e.preventDefault(); // Evita que la página se recargue
-    setMensaje('Procesando...');
+    e?.preventDefault();
+    setCargando(true);
+    setMensaje({ tipo: 'info', texto: 'Procesando...' });
 
-    // Usamos Supabase para intentar registrar al estudiante
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
+    const { data, error } = await supabase.auth.signUp({ email, password });
 
-    // Si Supabase nos devuelve un error, lo mostramos
     if (error) {
-      setMensaje('Error: ' + error.message);
+      setMensaje({ tipo: 'error', texto: error.message });
     } else if (data && data.session) {
-      // Solo hay sesión real si la confirmación por correo está desactivada
-      setMensaje('¡Registro exitoso!');
+      // Solo hay sesion real si la confirmacion por correo esta desactivada
+      setMensaje({ tipo: 'success', texto: 'Registro exitoso!' });
       localStorage.setItem('user', JSON.stringify(data.user));
       navigate(destinoSegunUsuario(data.user));
     } else {
-      // Sin sesión: el proyecto exige confirmar el correo antes de poder ingresar
-      setMensaje('¡Registro exitoso! Revisa tu correo para confirmar tu cuenta y luego inicia sesión.');
+      // Sin sesion: el proyecto exige confirmar el correo antes de poder ingresar
+      setMensaje({
+        tipo: 'success',
+        texto: 'Registro exitoso! Revisa tu correo para confirmar tu cuenta y luego inicia sesion.',
+      });
     }
+    setCargando(false);
   };
 
-  // Manejar inicio de sesión (sign in)
+  // Inicio de sesion (sign in)
   const manejarIngreso = async (e) => {
     e?.preventDefault();
-    setMensaje('Ingresando...');
+    setCargando(true);
+    setMensaje({ tipo: 'info', texto: 'Ingresando...' });
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setMensaje('Error: ' + error.message);
+      setMensaje({ tipo: 'error', texto: error.message });
+      setCargando(false);
     } else if (data && data.user) {
-      setMensaje('¡Ingreso exitoso! Redirigiendo...');
+      setMensaje({ tipo: 'success', texto: 'Ingreso exitoso! Redirigiendo...' });
       localStorage.setItem('user', JSON.stringify(data.user));
       navigate(destinoSegunUsuario(data.user));
     } else {
-      setMensaje('Ingreso completado.');
+      setMensaje({ tipo: 'info', texto: 'Ingreso completado.' });
+      setCargando(false);
     }
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h2>Ingreso a la Plataforma</h2>
-      <p>Regístrate con tu correo universitario</p>
-      
-      <form style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
-        <input
-          type="email"
-          placeholder="Ej: estudiante@ulima.edu.pe"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ padding: '10px', width: '280px', fontSize: '16px' }}
-        />
-        <input
-          type="password"
-          placeholder="Tu contraseña secreta"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: '10px', width: '280px', fontSize: '16px' }}
-        />
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button onClick={manejarIngreso} type="button" style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer', backgroundColor: '#36b37e', color: '#fff', fontWeight: 'bold', border: 'none' }}>
-            Iniciar sesión
-          </button>
-          <button onClick={manejarRegistro} type="button" style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer', backgroundColor: '#61dafb', color: '#000', fontWeight: 'bold', border: 'none' }}>
-            Registrarme
-          </button>
-        </div>
-      </form>
+    <div className="auth-page" data-theme={tema}>
+      <button className="auth-theme-toggle" onClick={alternarTema} title="Cambiar tema" type="button">
+        {tema === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+      </button>
 
-      {/* Aquí aparecerán los mensajes de error o éxito */}
-      <p style={{ marginTop: '20px', color: '#ffb7b2' }}>{mensaje}</p>
+      <div className="auth-card">
+        <div className="auth-brand">
+          <GraduationCap size={28} /> Educateca
+        </div>
+        <h2 className="auth-title">Bienvenido de vuelta</h2>
+        <p className="auth-subtitle">Ingresa con tu correo universitario</p>
+
+        <form onSubmit={manejarIngreso}>
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="email">Correo</label>
+            <div className="auth-input-wrap">
+              <Mail className="auth-lead-icon" size={18} />
+              <input
+                id="email"
+                className="auth-input"
+                type="email"
+                placeholder="estudiante@ulima.edu.pe"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+              />
+            </div>
+          </div>
+
+          <div className="auth-field">
+            <label className="auth-label" htmlFor="password">Contrase&ntilde;a</label>
+            <div className="auth-input-wrap">
+              <Lock className="auth-lead-icon" size={18} />
+              <input
+                id="password"
+                className="auth-input"
+                type={verPass ? 'text' : 'password'}
+                placeholder="Tu contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+              />
+              <button
+                className="auth-eye"
+                type="button"
+                onClick={() => setVerPass((v) => !v)}
+                title={verPass ? 'Ocultar' : 'Mostrar'}
+              >
+                {verPass ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <button className="auth-btn primary" type="submit" disabled={cargando}>
+            <LogIn size={18} /> Iniciar sesi&oacute;n
+          </button>
+        </form>
+
+        <div className="auth-divider">o</div>
+
+        <button className="auth-btn ghost" type="button" onClick={manejarRegistro} disabled={cargando}>
+          Crear una cuenta nueva
+        </button>
+
+        {mensaje && <p className={`auth-msg ${mensaje.tipo}`}>{mensaje.texto}</p>}
+      </div>
     </div>
   );
 }

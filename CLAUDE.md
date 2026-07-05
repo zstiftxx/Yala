@@ -12,6 +12,7 @@ App web para ayudar a estudiantes de la **Universidad de Lima** a hacer seguimie
 
 ## Autenticación y estado del usuario
 - Login con email/password de Supabase (`Login.jsx`). Tras registrarse, si el proyecto exige confirmar correo, `signUp` no da sesión → no redirige (evita "Auth session missing").
+- **`Login.jsx` rediseñado**: tarjeta centrada con marca, íconos en los campos (`lucide-react`), toggle de mostrar/ocultar contraseña, banner de mensaje tipado (error/success/info), estado `cargando` y toggle de tema propio. Reutiliza los tokens del shell: las variables CSS de `.app-shell` se comparten con `.auth-page` en `App.css`, así respeta el tema claro/oscuro.
 - El estado del usuario vive en **`user_metadata` de Supabase** y se espeja en `localStorage['user']`. Campos: `carrera`, `nombre`, `ciclo`, `estadoCursos`.
 - `RequireAuth` (en `App.jsx`) protege las rutas. Si una acción devuelve error de sesión, se limpia localStorage y se manda a `/`.
 - Tema claro/oscuro: toggle en el topbar, guardado en `localStorage['tema']`.
@@ -43,5 +44,4 @@ App web para ayudar a estudiantes de la **Universidad de Lima** a hacer seguimie
 - Mallas actualizadas de las 5 carreras pendientes.
 - Contenido real en `/curso/:curso` (apuntes/resúmenes/exámenes) — objetivo central de la app.
 - Páginas reales de "Notificaciones", "Feedback", "Reportar" (hoy solo texto en el nav).
-- Rediseño del login (sigue con el estilo simple viejo).
 - Opcional: agregar códigos/créditos reales a las tarjetas.
