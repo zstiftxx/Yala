@@ -41,9 +41,14 @@ App web para ayudar a estudiantes de la **Universidad de Lima** a hacer seguimie
 - Verificar cambios de UI con las herramientas de preview antes de dar por hecho.
 - **No inventar datos curriculares** (códigos de curso, créditos): se omitieron a propósito. Los PDF sí traen códigos/créditos reales si más adelante se quieren agregar.
 
+## Notificaciones / Feedback / Reportar
+- **`Notificaciones.jsx`** (`/notificaciones`): notificaciones **derivadas del estado local** (no hay backend de notificaciones). Genera: bienvenida, "completa tu perfil" (si falta nombre/carrera/ciclo), "N cursos en curso", y "malla en construcción" si la carrera está en la lista de pendientes. Estado leído/no-leído en `localStorage['notif_leidas']`. La campana del topbar también lleva aquí.
+- **`Feedback.jsx`** (`/feedback`) y **`Reportar.jsx`** (`/reportar`): formularios (tipo + mensaje) que **insertan en Supabase** (tablas `feedback` y `reportes`). Manejan sin sesión → limpian localStorage y van a `/`; si la tabla no existe (código `42P01`) muestran aviso pidiendo correr el SQL. Reportar guarda también la `carrera`.
+- **SQL de las tablas** en `supabase/tablas.sql` — correr **una vez** en Supabase → SQL Editor. Crea `feedback` y `reportes` con RLS (insert/select solo del propio `user_id`; tú ves todo desde el Table editor, que ignora RLS). **Pendiente hasta que se corra ese SQL los envíos fallan con el aviso.**
+
 ## Pendientes / ideas futuras
+- Correr `supabase/tablas.sql` en Supabase para que Feedback/Reportar guarden de verdad.
 - Decidir el nombre de la app.
 - Mallas actualizadas de las 5 carreras pendientes.
 - Contenido real en `/curso/:curso` (apuntes/resúmenes/exámenes) — objetivo central de la app.
-- Páginas reales de "Notificaciones", "Feedback", "Reportar" (hoy solo texto en el nav).
 - Opcional: agregar códigos/créditos reales a las tarjetas.

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
-import { LayoutGrid, Bell, BookOpen, MessageSquare, User, LogOut, Moon, Sun } from 'lucide-react';
+import { LayoutGrid, Bell, BookOpen, MessageSquare, User, LogOut, Moon, Sun, AlertTriangle } from 'lucide-react';
 
 export default function Sidebar({ active, children, sinNav }) {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ export default function Sidebar({ active, children, sinNav }) {
       <header className="app-topbar">
         <Link to="/home" className="app-brand" style={{ textDecoration: 'none' }}>Educateca</Link>
         <div className="app-topbar-actions">
-          <button className="icon-btn" title="Notificaciones">
+          <button className="icon-btn" onClick={() => navigate('/notificaciones')} title="Notificaciones">
             <Bell size={18} />
           </button>
           <button className="icon-btn" onClick={alternarTema} title="Cambiar tema">
@@ -49,11 +49,18 @@ export default function Sidebar({ active, children, sinNav }) {
                 <li className={active === 'dashboard' ? 'active' : ''}>
                   <Link to="/home" style={linkStyle}><LayoutGrid size={18} /> Dashboard</Link>
                 </li>
-                <li><Bell size={18} /> Notificaciones</li>
+                <li className={active === 'notificaciones' ? 'active' : ''}>
+                  <Link to="/notificaciones" style={linkStyle}><Bell size={18} /> Notificaciones</Link>
+                </li>
                 <li className={active === 'mis-cursos' ? 'active' : ''}>
                   <Link to="/mis-cursos" style={linkStyle}><BookOpen size={18} /> Mis Cursos</Link>
                 </li>
-                <li><MessageSquare size={18} /> Feedback</li>
+                <li className={active === 'feedback' ? 'active' : ''}>
+                  <Link to="/feedback" style={linkStyle}><MessageSquare size={18} /> Feedback</Link>
+                </li>
+                <li className={active === 'reportar' ? 'active' : ''}>
+                  <Link to="/reportar" style={linkStyle}><AlertTriangle size={18} /> Reportar</Link>
+                </li>
                 <li className={active === 'perfil' ? 'active' : ''}>
                   <Link to="/perfil" style={linkStyle}><User size={18} /> Perfil</Link>
                 </li>

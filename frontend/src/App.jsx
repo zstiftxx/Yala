@@ -6,6 +6,9 @@ import Perfil from './Perfil.jsx';
 import MapaCurricular from './MapaCurricular.jsx';
 import MisCursos from './MisCursos.jsx';
 import CursoDetalle from './CursoDetalle.jsx';
+import Notificaciones from './Notificaciones.jsx';
+import Feedback from './Feedback.jsx';
+import Reportar from './Reportar.jsx';
 import './App.css';
 
 function RequireAuth({ children }) {
@@ -30,6 +33,9 @@ function App() {
       <Route path="/mapa-curricular" element={<RequireAuth><MapaCurricular /></RequireAuth>} />
       <Route path="/mis-cursos" element={<RequireAuth><MisCursos /></RequireAuth>} />
       <Route path="/curso/:curso" element={<RequireAuth><CursoDetalle /></RequireAuth>} />
+      <Route path="/notificaciones" element={<RequireAuth><Notificaciones /></RequireAuth>} />
+      <Route path="/feedback" element={<RequireAuth><Feedback /></RequireAuth>} />
+      <Route path="/reportar" element={<RequireAuth><Reportar /></RequireAuth>} />
     </Routes>
   );
 }

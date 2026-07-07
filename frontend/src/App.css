@@ -73,9 +73,12 @@
   min-height: calc(100svh - 57px);
 }
 .sidebar nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
-.sidebar nav li { padding: 10px 12px; border-radius: 8px; font-weight: 500; cursor: default; display: flex; align-items: center; gap: 10px; opacity: 0.6; }
-.sidebar nav li a { color: inherit; }
+.sidebar nav li { border-radius: 8px; font-weight: 500; opacity: 0.6; }
+.sidebar nav li a { color: inherit; padding: 10px 12px; border-radius: 8px; }
+.sidebar nav li:hover { opacity: 1; }
+.sidebar nav li:hover a { background: var(--shell-bg); }
 .sidebar nav li.active { background: var(--shell-accent-bg); color: var(--shell-accent); opacity: 1; }
+.sidebar nav li.active:hover a { background: transparent; }
 .sidebar-bottom { margin-top: auto }
 .sidebar .logout {
   background: transparent;
