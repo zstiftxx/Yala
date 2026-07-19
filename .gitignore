@@ -2,3 +2,11 @@ node_modules
 .env
 .env.*
 !.env.example
+
+# Notas de investigacion y grafo de conocimiento: son de uso interno y este
+# repo es publico. Se quedan en local a proposito.
+research/
+graphify-out/
+
+# Config local de Claude Code
+.claude/
