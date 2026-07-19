@@ -4,6 +4,26 @@ App web para ayudar a estudiantes de la **Universidad de Lima** a hacer seguimie
 
 > El nombre "Educateca" es provisional; el usuario aún no decide el definitivo (aparece en el topbar de `Sidebar.jsx` y en `frontend/index.html`).
 
+## Grafo del codigo (usarlo ANTES de leer archivos)
+
+Hay un grafo del codigo en `graphify-out/` (solo `frontend/src`, sin configs ni deps). Para orientarte sobre estructura, quien llama a que, o donde vive algo, **consultalo por CLI en vez de grepear el codigo**:
+
+```
+graphify explain "obtenerMallaCompleta"     # ~150 tokens: archivo, linea, y quien lo usa
+graphify path "Dashboard()" "supabase"      # camino mas corto entre dos cosas
+graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
+```
+
+- **NUNCA leer `graphify-out/graph.json` entero** (~15k tokens, mas caro que grepear). Solo consultas CLI.
+- `graphify-out/GRAPH_REPORT.md` (~1k tokens) sirve como orientacion general de una sola lectura.
+- El grafo da estructura, no contenido: para editar codigo igual hay que leer el archivo. Y **no incluye CSS ni JSX renderizado**.
+- Se desactualiza al cambiar el codigo. Reconstruir (segundos, sin API key, cero tokens):
+  ```
+  GRAPHIFY_OUT=/d/proyecto/WAAAAAAAA/graphify-out graphify update frontend/src
+  ```
+  El `GRAPHIFY_OUT` es obligatorio: sin el, escribe la salida dentro de `frontend/src/`.
+- `graphify-out/` esta en `.gitignore` a proposito (repo publico). No hay respaldo: si se borra, se regenera.
+
 ## Stack y cómo correr
 - **React 19 + Vite** (carpeta `frontend/`), **react-router-dom v7**, **Supabase** (auth + persistencia), **lucide-react** (íconos).
 - Correr: `cd frontend && npm run dev` (puerto 5173). **No** usar "Go Live"/Live Server (sirve el HTML crudo sin compilar JSX → pantalla en blanco).
