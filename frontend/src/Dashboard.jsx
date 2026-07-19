@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import { cursosGeneralesPorCarrera, carreras } from './data/cursosGenerales';
+import { obtenerMallaCompleta, carrerasConMallaCompleta, cursosDisponibles } from './data/mallaCurricular';
 import Sidebar from './Sidebar.jsx';
-import { RefreshCw, Map, TrendingUp, BookCheck, CalendarClock, BookX, ArrowLeftRight } from 'lucide-react';
+import { RefreshCw, Map, TrendingUp, BookCheck, CalendarClock, BookX, ArrowLeftRight, Info, Unlock } from 'lucide-react';
 
 function estadoInicialDesde(metadata) {
   if (metadata?.estadoCursos) return metadata.estadoCursos;
@@ -24,11 +25,17 @@ export default function Dashboard() {
   const [estadoCursos, setEstadoCursos] = useState(estadoInicialDesde(usuarioGuardado?.user_metadata));
   const [cambiandoCarrera, setCambiandoCarrera] = useState(false);
 
-  const todosLosCursos = cursosGenerales ? [...cursosGenerales[1], ...cursosGenerales[2]] : [];
+  // El progreso se calcula sobre la malla completa (todos los ciclos), no solo
+  // los generales. Para las carreras sin malla actualizada, obtenerMallaCompleta
+  // devuelve solo los ciclos 1-2 y lo advertimos en pantalla.
+  const malla = obtenerMallaCompleta(carrera);
+  const mallaCompleta = carrerasConMallaCompleta.includes(carrera);
+  const todosLosCursos = malla ? Object.values(malla).flat() : [];
   const totalCursos = todosLosCursos.length;
   const aprobadosCount = todosLosCursos.filter((c) => estadoCursos[c] === 'aprobado').length;
   const enCursoCount = todosLosCursos.filter((c) => estadoCursos[c] === 'en_curso').length;
   const noCursadoCount = totalCursos - aprobadosCount - enCursoCount;
+  const { disponibles, sinDatos } = cursosDisponibles(carrera, estadoCursos);
   const progreso = totalCursos > 0 ? Math.round((aprobadosCount / totalCursos) * 100) : 0;
 
   const cambiarEstado = async (curso, nuevoEstado) => {
@@ -137,7 +144,61 @@ export default function Dashboard() {
         </div>
       </section>
 
+      {malla && !mallaCompleta && (
+        <div className="aviso-malla">
+          <Info size={16} />
+          <span>
+            Todavia no tenemos la malla actualizada de {carrera}. El avance que ves
+            corresponde solo a los ciclos 1 y 2.
+          </span>
+        </div>
+      )}
+
       <section className="cards">
+        {malla && (
+          <div className="card disponibles">
+            <h3><Unlock size={16} /> Puedes llevar ahora</h3>
+            <p className="disponibles-sub">
+              Cursos con todos sus prerrequisitos aprobados.
+            </p>
+            {disponibles.length > 0 ? (
+              <div className="list">
+                {disponibles.map(({ curso, ciclo }) => (
+                  <div key={curso} className="list-item list-item-status">
+                    <span>{curso}</span>
+                    <span className="disponibles-ciclo">Ciclo {ciclo}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="disponibles-vacio">
+                No hay cursos habilitados: ya aprobaste o estas llevando todo lo que
+                tus prerrequisitos permiten.
+              </p>
+            )}
+
+            {sinDatos.length > 0 && (
+              <details className="disponibles-sindatos">
+                <summary>
+                  Sin prerrequisitos registrados ({sinDatos.length})
+                </summary>
+                <p className="disponibles-nota">
+                  No tenemos los prerrequisitos de estos cursos, asi que no podemos
+                  confirmar si ya los puedes llevar.
+                </p>
+                <div className="list">
+                  {sinDatos.map(({ curso, ciclo }) => (
+                    <div key={curso} className="list-item list-item-status">
+                      <span>{curso}</span>
+                      <span className="disponibles-ciclo muted">Ciclo {ciclo}</span>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
+          </div>
+        )}
+
         {cursosGenerales ? (
           <>
             <div className="card courses">

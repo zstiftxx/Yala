@@ -127,3 +127,49 @@ export function obtenerMallaCompleta(carrera) {
 
   return { ...generales, ...avanzados };
 }
+
+// Cursos que el alumno puede llevar ahora: los que aun no aprobo ni esta llevando
+// y cuyos prerrequisitos estan todos aprobados.
+//
+// Ojo con los ciclos 3+ sin prerrequisitos declarados: los PDF oficiales no
+// siempre los traen y la cobertura varia mucho por carrera (0% de huecos en
+// Economia, ~49% en Mecatronica). Para esos no podemos afirmar que esten
+// habilitados sin inventar data curricular, asi que se devuelven aparte en
+// `sinDatos` en vez de colarse entre los disponibles. En ciclos 1-2 la ausencia
+// de prerrequisitos si es real.
+//
+// Devuelve { disponibles, sinDatos }, ambos [{ curso, ciclo }] ordenados por
+// ciclo y luego alfabeticamente.
+export function cursosDisponibles(carrera, estadoCursos = {}) {
+  const malla = obtenerMallaCompleta(carrera);
+  if (!malla) return { disponibles: [], sinDatos: [] };
+
+  const prereqs = obtenerPrerequisitos(carrera);
+  const aprobado = (curso) => estadoCursos[curso] === 'aprobado';
+
+  const disponibles = [];
+  const sinDatos = [];
+
+  Object.entries(malla).forEach(([ciclo, cursos]) => {
+    const n = Number(ciclo);
+    cursos.forEach((curso) => {
+      const estado = estadoCursos[curso];
+      if (estado === 'aprobado' || estado === 'en_curso') return;
+
+      const lista = prereqs[curso] || [];
+      if (!lista.length && n >= 3) {
+        sinDatos.push({ curso, ciclo: n });
+      } else if (lista.every(aprobado)) {
+        disponibles.push({ curso, ciclo: n });
+      }
+    });
+  });
+
+  const porCicloYNombre = (a, b) =>
+    a.ciclo - b.ciclo || a.curso.localeCompare(b.curso, 'es');
+
+  return {
+    disponibles: disponibles.sort(porCicloYNombre),
+    sinDatos: sinDatos.sort(porCicloYNombre),
+  };
+}
