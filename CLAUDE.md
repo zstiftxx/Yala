@@ -46,11 +46,15 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - Tema claro/oscuro: toggle en el topbar, guardado en `localStorage['tema']`.
 
 ## Rutas
-`/` Login · `/carrera` onboarding de carrera · `/home` Dashboard · `/perfil` · `/mis-cursos` · `/curso/:curso` (stub) · `/mapa-curricular`.
+`/` Login · `/carrera` onboarding de carrera · `/home` Dashboard · `/perfil` · `/mis-cursos` · `/curso/:curso` · `/mapa-curricular` · `/notificaciones` · `/feedback` · `/reportar`.
 
 ## Estructura clave
 - **`Sidebar.jsx`** = shell de la app (topbar + nav + contenido); prop `sinNav` oculta el nav lateral (lo usa el mapa curricular).
+- **`useTema.js`** — el toggle claro/oscuro. Lo usan Login, Sidebar, NoEncontrado y SeleccionCarrera; no duplicar ese `localStorage['tema']` en páginas nuevas.
+- **`FormularioMensaje.jsx`** — Feedback y Reportar son el mismo formulario (tipo + mensaje + insert en Supabase) y solo pasan textos. Si aparece un tercer formulario de ese estilo, va por aquí.
+- **Estilos**: las clases compartidas viven en `App.css` (`form-input`, `form-label`, `form-col`, `page-intro`, `vacio`, `chip`, `filtros`, `buscador`). **No** meter estilos inline nuevos ni colores hardcodeados: todo sale de las variables `--shell-*`, que son las que hacen funcionar el modo oscuro.
 - **Estados de curso**: 3 valores — `no_cursado` / `en_curso` / `aprobado` — en `estadoCursos` (objeto `curso -> estado`). El Dashboard calcula Progreso/Aprobados/En curso/No cursados de ahí.
+- **`MisCursos.jsx`** = catálogo de toda la malla agrupado por ciclo, con buscador (compara sin tildes) y filtros por estado. Es la puerta de entrada a `/curso/:curso`.
 - **`MapaCurricular.jsx`**: grilla por ciclos (encaja sin scroll), flechas SVG de prerrequisito, clic en un curso resalta su camino (prereqs + dependientes), panel para cambiar estado.
 
 ## Datos de mallas (`frontend/src/data/`)
@@ -68,14 +72,22 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - **No inventar datos curriculares** (códigos de curso, créditos): se omitieron a propósito. Los PDF sí traen códigos/créditos reales si más adelante se quieren agregar.
 
 ## Notificaciones / Feedback / Reportar
-- **`Notificaciones.jsx`** (`/notificaciones`): notificaciones **derivadas del estado local** (no hay backend de notificaciones). Genera: bienvenida, "completa tu perfil" (si falta nombre/carrera/ciclo), "N cursos en curso", y "malla en construcción" si la carrera está en la lista de pendientes. Estado leído/no-leído en `localStorage['notif_leidas']`. La campana del topbar también lleva aquí.
+- **`Notificaciones.jsx`** (`/notificaciones`): notificaciones **derivadas del estado local** (no hay backend de notificaciones). Genera: bienvenida, "completa tu perfil" (si falta nombre/carrera/ciclo), "N cursos en curso", y "malla en construcción" si la carrera **no** está en `carrerasConMallaCompleta` (antes era una lista escrita a mano, con las tildes mal, y ese aviso nunca salía para las dos ingenierías). Estado leído/no-leído en `localStorage['notif_leidas']`. La campana del topbar también lleva aquí.
 - **`Feedback.jsx`** (`/feedback`) y **`Reportar.jsx`** (`/reportar`): formularios (tipo + mensaje) que **insertan en Supabase** (tablas `feedback` y `reportes`). Manejan sin sesión → limpian localStorage y van a `/`; si la tabla no existe (código `42P01`) muestran aviso pidiendo correr el SQL. Reportar guarda también la `carrera`.
 - **SQL de las tablas** en `supabase/tablas.sql` — correr **una vez** en Supabase → SQL Editor. Crea `feedback` y `reportes` con RLS (insert/select solo del propio `user_id`; tú ves todo desde el Table editor, que ignora RLS). **Pendiente hasta que se corra ese SQL los envíos fallan con el aviso.**
-- **`supabase/materiales.sql`** — tabla `materiales` (apuntes/resúmenes/exámenes por curso) para el objetivo central de la app. `user_metadata` no sirve para esto: es por usuario, no compartido. Material = **enlace**, no archivo subido (sin Storage por ahora). El curso se identifica por nombre, igual que `estadoCursos`. **Aún no se corrió y la app todavía no lo lee**: `/curso/:curso` sigue siendo stub.
+- **`supabase/materiales.sql`** — tabla `materiales` (apuntes/resúmenes/exámenes por curso) para el objetivo central de la app. `user_metadata` no sirve para esto: es por usuario, no compartido. Material = **enlace**, no archivo subido (sin Storage por ahora). El curso se identifica por nombre, igual que `estadoCursos`. **Pendiente correrlo**: hasta entonces `/curso/:curso` muestra el aviso de que falta la tabla.
+
+## Materiales por curso (`/curso/:curso`)
+- **`src/materiales.js`** es la única capa que toca la tabla `materiales`: listar, crear, borrar, y traducir errores de Postgres (incluye el `42P01` de tabla inexistente). Las páginas no llaman a `supabase.from('materiales')` por su cuenta.
+- `normalizarUrl` solo acepta `http(s)`. La URL termina en un `href`, así que un `javascript:` pegado por otro usuario sería un XSS de un clic. No relajar eso.
+- La lista vive en un componente hijo con `key={curso}` para que se remonte al saltar de un curso a otro.
+- **Moderación**: `aprobado` arranca en `false` y se aprueba a mano desde el Table editor de Supabase. El autor ve lo suyo marcado como "Pendiente de revisión"; el resto solo ve lo aprobado.
+- Se llega a un curso desde `/mis-cursos` (catálogo con buscador) o desde el panel del mapa curricular.
 
 ## Pendientes / ideas futuras
 - Correr `supabase/tablas.sql` en Supabase para que Feedback/Reportar guarden de verdad.
 - Decidir el nombre de la app.
 - Mallas actualizadas de las 5 carreras pendientes.
-- Contenido real en `/curso/:curso` (apuntes/resúmenes/exámenes) — objetivo central de la app.
+- Correr `supabase/materiales.sql` para que `/curso/:curso` deje de mostrar el aviso de tabla faltante.
+- **Verificar en el navegador las pantallas con sesión** (Mis Cursos, detalle de curso, Perfil, onboarding): se rediseñaron con lint+build limpios, pero el preview no puede pasar el login.
 - Opcional: agregar códigos/créditos reales a las tarjetas.
