@@ -197,6 +197,10 @@
   flex-shrink: 0;
 }
 
+.malla-titulo { display: flex; align-items: center; gap: 12px; }
+.malla-titulo h1 { font-size: 20px; }
+.malla-carrera { margin: 2px 0 0; color: var(--shell-text-muted); font-size: 13px; }
+
 .malla-grid { position: relative; display: grid; gap: 28px 18px; align-items: start; padding-bottom: 12px; }
 .malla-svg { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
 .malla-columna { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
@@ -255,6 +259,7 @@
   outline: none; transition: border-color .15s, box-shadow .15s;
 }
 .form-input:focus { border-color: var(--shell-accent); box-shadow: 0 0 0 3px var(--shell-accent-bg); }
+.form-input:disabled { color: var(--shell-text-muted); cursor: not-allowed; }
 textarea.form-input { resize: vertical; }
 .form-col { display: flex; flex-direction: column; gap: 16px; }
 .form-fila { display: flex; gap: 12px; }
@@ -314,6 +319,22 @@ textarea.form-input { resize: vertical; }
   margin-top: 6px; font-size: 12px; color: var(--shell-text-muted);
 }
 .material-meta .pendiente { color: var(--shell-accent); font-weight: 600; }
+
+/* ---- Notificaciones ---- */
+.notif-lista { max-width: 640px; }
+.notif-enlace { text-decoration: none; color: inherit; }
+.notif {
+  display: flex; align-items: flex-start; gap: 12px;
+  border-left: 3px solid transparent; cursor: pointer;
+}
+.notif.no-leida { border-left-color: var(--shell-accent); }
+.notif-icono { flex-shrink: 0; margin-top: 2px; color: var(--shell-accent); }
+.notif-titulo { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.notif-punto {
+  width: 8px; height: 8px; border-radius: 999px;
+  background: var(--shell-accent); display: inline-block; flex-shrink: 0;
+}
+.notif-texto { font-size: 13px; color: var(--shell-text-muted); margin-top: 2px; }
 
 /* ---- Auth / Login ---- */
 .auth-page {
@@ -384,6 +405,11 @@ textarea.form-input { resize: vertical; }
   transition: border-color .15s, box-shadow .15s;
 }
 .auth-input:focus { border-color: var(--shell-accent); box-shadow: 0 0 0 3px var(--shell-accent-bg); }
+/* Los selects del onboarding no llevan icono adelante, asi que no necesitan
+   el hueco de 38px que dejan los campos del login. */
+.auth-input.sin-icono { padding-left: 12px; }
+.auth-card.centrado { text-align: center; }
+.auth-card.centrado .auth-title { margin-top: 14px; }
 .auth-input::placeholder { color: var(--shell-text-muted); }
 .auth-eye {
   position: absolute;

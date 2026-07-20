@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Sidebar from './Sidebar.jsx';
 import { useUser } from './useUser';
 import { carreras } from './data/cursosGenerales';
+import { Save } from 'lucide-react';
 
 export default function Perfil() {
   const { user, nombre: nombreGuardado, carrera: carreraGuardada, ciclo: cicloGuardado, actualizarMetadata } = useUser();
@@ -26,37 +27,31 @@ export default function Perfil() {
       <header className="topbar">
         <h1>Mi Perfil</h1>
       </header>
+      <p className="page-intro">
+        Estos datos personalizan tu Dashboard y las notificaciones.
+      </p>
 
-      <section className="card" style={{ maxWidth: '480px' }}>
-        <form onSubmit={manejarGuardar} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <label>
+      <section className="card form-estrecho">
+        <form onSubmit={manejarGuardar} className="form-col">
+          <label className="form-label">
             Correo
-            <input
-              type="email"
-              value={user?.email || ''}
-              disabled
-              style={{ padding: '10px', width: '100%', fontSize: '16px', marginTop: '5px', boxSizing: 'border-box' }}
-            />
+            <input className="form-input" type="email" value={user?.email || ''} disabled />
           </label>
 
-          <label>
+          <label className="form-label">
             Nombre completo
             <input
+              className="form-input"
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Tu nombre"
-              style={{ padding: '10px', width: '100%', fontSize: '16px', marginTop: '5px', boxSizing: 'border-box' }}
             />
           </label>
 
-          <label>
+          <label className="form-label">
             Carrera
-            <select
-              value={carrera}
-              onChange={(e) => setCarrera(e.target.value)}
-              style={{ padding: '10px', width: '100%', fontSize: '16px', marginTop: '5px', boxSizing: 'border-box' }}
-            >
+            <select className="form-input" value={carrera} onChange={(e) => setCarrera(e.target.value)}>
               <option value="">Selecciona tu carrera...</option>
               {carreras.map((c) => (
                 <option key={c} value={c}>{c}</option>
@@ -64,29 +59,25 @@ export default function Perfil() {
             </select>
           </label>
 
-          <label>
+          <label className="form-label">
             Ciclo actual
             <input
+              className="form-input"
               type="number"
               min="1"
               max="12"
               value={ciclo}
               onChange={(e) => setCiclo(e.target.value)}
               placeholder="Ej: 3"
-              style={{ padding: '10px', width: '100%', fontSize: '16px', marginTop: '5px', boxSizing: 'border-box' }}
             />
           </label>
 
-          <button
-            type="submit"
-            disabled={guardando}
-            style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer', backgroundColor: '#36b37e', color: '#fff', fontWeight: 'bold', border: 'none' }}
-          >
-            {guardando ? 'Guardando...' : 'Guardar cambios'}
+          <button type="submit" className="btn primary" disabled={guardando}>
+            <Save size={16} /> {guardando ? 'Guardando...' : 'Guardar cambios'}
           </button>
         </form>
 
-        {mensaje && <p style={{ marginTop: '15px', color: '#ffb7b2' }}>{mensaje}</p>}
+        {mensaje && <p className="auth-msg success">{mensaje}</p>}
       </section>
     </Sidebar>
   );

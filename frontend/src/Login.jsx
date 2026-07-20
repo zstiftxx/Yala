@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GraduationCap, Mail, Lock, Eye, EyeOff, LogIn, Moon, Sun } from 'lucide-react';
 // Importamos la "tuberia" que creaste con Claude
 import { supabase } from './supabaseClient';
+import { useTema } from './useTema';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -10,14 +11,8 @@ function Login() {
   const [mensaje, setMensaje] = useState(null); // { tipo: 'error'|'success'|'info', texto }
   const [cargando, setCargando] = useState(false);
   const [verPass, setVerPass] = useState(false);
-  const [tema, setTema] = useState(localStorage.getItem('tema') || 'light');
+  const { tema, alternarTema } = useTema();
   const navigate = useNavigate();
-
-  const alternarTema = () => {
-    const nuevo = tema === 'light' ? 'dark' : 'light';
-    setTema(nuevo);
-    localStorage.setItem('tema', nuevo);
-  };
 
   const destinoSegunUsuario = (user) => (user?.user_metadata?.carrera ? '/home' : '/carrera');
 

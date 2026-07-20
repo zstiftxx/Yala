@@ -105,46 +105,28 @@ export default function Notificaciones() {
           <p>No tienes notificaciones por ahora.</p>
         </div>
       ) : (
-        <div className="list" style={{ maxWidth: '640px' }}>
+        <div className="list notif-lista">
           {notifs.map((n) => {
             const Icono = n.icono;
             const noLeida = !leidas.includes(n.id);
             const contenido = (
               <div
-                className="list-item"
-                style={{
-                  display: 'flex',
-                  gap: '12px',
-                  alignItems: 'flex-start',
-                  borderLeft: noLeida ? '3px solid var(--shell-accent)' : '3px solid transparent',
-                }}
+                className={`list-item notif${noLeida ? ' no-leida' : ''}`}
                 onClick={() => marcarLeida(n.id)}
               >
-                <Icono size={20} style={{ flexShrink: 0, marginTop: '2px', color: 'var(--shell-accent)' }} />
+                <Icono size={20} className="notif-icono" />
                 <div>
-                  <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div className="notif-titulo">
                     {n.titulo}
-                    {noLeida && (
-                      <span
-                        style={{
-                          width: '8px',
-                          height: '8px',
-                          borderRadius: '999px',
-                          background: 'var(--shell-accent)',
-                          display: 'inline-block',
-                        }}
-                      />
-                    )}
+                    {noLeida && <span className="notif-punto" />}
                   </div>
-                  <div style={{ fontSize: '13px', color: 'var(--shell-text-muted)', marginTop: '2px' }}>
-                    {n.texto}
-                  </div>
+                  <div className="notif-texto">{n.texto}</div>
                 </div>
               </div>
             );
 
             return n.to ? (
-              <Link key={n.id} to={n.to} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link key={n.id} to={n.to} className="notif-enlace">
                 {contenido}
               </Link>
             ) : (

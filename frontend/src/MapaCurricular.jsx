@@ -117,11 +117,11 @@ export default function MapaCurricular() {
   return (
     <Sidebar active="dashboard" sinNav>
       <header className="topbar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="malla-titulo">
           <Link to="/home" className="btn"><ArrowLeft size={16} /> Dashboard</Link>
           <div>
-            <h1 style={{ fontSize: '20px' }}>Mapa Curricular</h1>
-            <p style={{ color: 'var(--shell-text-muted)', fontSize: '13px' }}>{carrera}</p>
+            <h1>Mapa Curricular</h1>
+            <p className="malla-carrera">{carrera}</p>
           </div>
         </div>
       </header>

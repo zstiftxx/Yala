@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from './useUser';
 import { useEsMovil } from './useEsMovil';
+import { useTema } from './useTema';
 import { LayoutGrid, Bell, BookOpen, MessageSquare, User, LogOut, Moon, Sun, AlertTriangle } from 'lucide-react';
 
 // Fuente unica de la navegacion: el nav lateral y la tab bar movil leen de aqui,
@@ -62,13 +62,7 @@ export default function Sidebar({ active, children, sinNav }) {
   const nombre = nombreGuardado || user?.email || 'Estudiante';
   const inicial = (nombre || '?').charAt(0).toUpperCase();
 
-  const [tema, setTema] = useState(localStorage.getItem('tema') || 'light');
-
-  const alternarTema = () => {
-    const nuevo = tema === 'light' ? 'dark' : 'light';
-    setTema(nuevo);
-    localStorage.setItem('tema', nuevo);
-  };
+  const { tema, alternarTema } = useTema();
 
   const manejarLogout = async () => {
     await cerrarSesion();
