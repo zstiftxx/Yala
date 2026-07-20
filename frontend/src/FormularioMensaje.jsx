@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import Sidebar from './Sidebar.jsx';
 import { useUser } from './useUser';
+import { faltaLaTabla, sesionInvalida } from './erroresSupabase';
 
 // Feedback y Reportar son la misma pantalla con otros textos: un selector de
 // tipo, un textarea y un insert en Supabase. Estaban duplicadas linea por
@@ -54,15 +55,14 @@ export default function FormularioMensaje({
     });
 
     if (error) {
-      if (error.message.toLowerCase().includes('session')) {
+      if (sesionInvalida(error)) {
         localStorage.removeItem('user');
         navigate('/');
         return;
       }
-      const faltaTabla = error.code === '42P01' || error.message.toLowerCase().includes('does not exist');
       setAviso({
         clase: 'error',
-        texto: faltaTabla
+        texto: faltaLaTabla(error)
           ? `La tabla ${tabla} aun no existe en Supabase. Corre el SQL de supabase/tablas.sql.`
           : 'No se pudo enviar: ' + error.message,
       });

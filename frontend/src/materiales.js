@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { faltaLaTabla, sesionInvalida } from './erroresSupabase';
 
 // Acceso a la tabla `materiales` (ver supabase/materiales.sql). Vive aparte de
 // la pagina para que CursoDetalle solo se ocupe de pintar: aca se centraliza el
@@ -19,11 +20,10 @@ export function etiquetaTipo(valor) {
 // Errores esperables, en el mismo formato que ya usan Feedback/Reportar.
 // `sesion: true` avisa a la pagina que debe mandar al login.
 function traducirError(error) {
-  const texto = (error.message || '').toLowerCase();
-  if (texto.includes('session') || texto.includes('jwt')) {
+  if (sesionInvalida(error)) {
     return { sesion: true, mensaje: 'Tu sesion expiro.' };
   }
-  if (error.code === '42P01' || texto.includes('does not exist')) {
+  if (faltaLaTabla(error)) {
     return {
       mensaje:
         'La tabla de materiales aun no existe en Supabase. Corre el SQL de supabase/materiales.sql.',
