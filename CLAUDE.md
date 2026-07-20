@@ -29,7 +29,8 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - Correr: `cd frontend && npm run dev` (puerto 5173). **No** usar "Go Live"/Live Server (sirve el HTML crudo sin compilar JSX → pantalla en blanco).
 - `frontend/.env` tiene `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` (está en `.gitignore`, no commitear).
 - Repo: `github.com/zstiftxx/Yala`, rama `main`.
-- **Desplegado en Vercel** (deploy automático en cada `git push` a `main`). Config: *Root Directory* = `frontend`, y las dos vars `VITE_SUPABASE_*` cargadas como Environment Variables. El dominio de Vercel debe estar en Supabase → Authentication → URL Configuration (Site URL + Redirect URLs) para que el login funcione desde el link público.
+- **Desplegado en Vercel** (deploy automático en cada `git push` a `main`). Config: *Root Directory* = `frontend`, y las dos vars `VITE_SUPABASE_*` cargadas como Environment Variables.
+- **`frontend/vercel.json` es obligatorio**: reescribe todas las rutas a `index.html`. Sin eso, entrar directo a `/home` (o recargar ahí, o abrir un link compartido) devuelve el 404 **de Vercel**, porque las rutas de React Router no existen como archivos en el servidor. Vercel no agrega ese fallback solo en proyectos Vite. Va en `frontend/` y no en la raíz del repo porque el *Root Directory* es `frontend`. Los archivos que sí existen (`/assets/*`) tienen prioridad sobre la reescritura. El dominio de Vercel debe estar en Supabase → Authentication → URL Configuration (Site URL + Redirect URLs) para que el login funcione desde el link público.
 
 ## Autenticación y estado del usuario
 - Login con email/password de Supabase (`Login.jsx`). El código maneja ambos casos: si el proyecto exige confirmar correo, `signUp` no da sesión → no redirige (evita "Auth session missing"); si no, entra directo.
