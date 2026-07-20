@@ -74,8 +74,8 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 ## Notificaciones / Feedback / Reportar
 - **`Notificaciones.jsx`** (`/notificaciones`): notificaciones **derivadas del estado local** (no hay backend de notificaciones). Genera: bienvenida, "completa tu perfil" (si falta nombre/carrera/ciclo), "N cursos en curso", y "malla en construcción" si la carrera **no** está en `carrerasConMallaCompleta` (antes era una lista escrita a mano, con las tildes mal, y ese aviso nunca salía para las dos ingenierías). Estado leído/no-leído en `localStorage['notif_leidas']`. La campana del topbar también lleva aquí.
 - **`Feedback.jsx`** (`/feedback`) y **`Reportar.jsx`** (`/reportar`): formularios (tipo + mensaje) que **insertan en Supabase** (tablas `feedback` y `reportes`). Manejan sin sesión → limpian localStorage y van a `/`; si la tabla no existe (código `42P01`) muestran aviso pidiendo correr el SQL. Reportar guarda también la `carrera`.
-- **SQL de las tablas** en `supabase/tablas.sql` — correr **una vez** en Supabase → SQL Editor. Crea `feedback` y `reportes` con RLS (insert/select solo del propio `user_id`; tú ves todo desde el Table editor, que ignora RLS). **Pendiente hasta que se corra ese SQL los envíos fallan con el aviso.**
-- **`supabase/materiales.sql`** — tabla `materiales` (apuntes/resúmenes/exámenes por curso) para el objetivo central de la app. `user_metadata` no sirve para esto: es por usuario, no compartido. Material = **enlace**, no archivo subido (sin Storage por ahora). El curso se identifica por nombre, igual que `estadoCursos`. **Pendiente correrlo**: hasta entonces `/curso/:curso` muestra el aviso de que falta la tabla.
+- **SQL de las tablas** en `supabase/tablas.sql` — **ya corrido (2026-07-20)**. Crea `feedback` y `reportes` con RLS (insert/select solo del propio `user_id`; tú ves todo desde el Table editor, que ignora RLS).
+- **`supabase/materiales.sql`** — tabla `materiales` (apuntes/resúmenes/exámenes por curso) para el objetivo central de la app. `user_metadata` no sirve para esto: es por usuario, no compartido. Material = **enlace**, no archivo subido (sin Storage por ahora). El curso se identifica por nombre, igual que `estadoCursos`. **Ya corrido (2026-07-20)**: verificado que existe, que el `select` anónimo devuelve vacío en vez de error y que el `insert` anónimo lo rechaza la RLS con `42501`.
 
 ## Materiales por curso (`/curso/:curso`)
 - **`src/materiales.js`** es la única capa que toca la tabla `materiales`: listar, crear, borrar, y traducir errores de Postgres (incluye el `42P01` de tabla inexistente). Las páginas no llaman a `supabase.from('materiales')` por su cuenta.
@@ -85,9 +85,9 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - Se llega a un curso desde `/mis-cursos` (catálogo con buscador) o desde el panel del mapa curricular.
 
 ## Pendientes / ideas futuras
-- Correr `supabase/tablas.sql` en Supabase para que Feedback/Reportar guarden de verdad.
+- **Probar el flujo real con sesión** ahora que las tablas existen: enviar un feedback, un reporte, y subir/borrar un material desde `/curso/:curso`.
 - Decidir el nombre de la app.
 - Mallas actualizadas de las 5 carreras pendientes.
-- Correr `supabase/materiales.sql` para que `/curso/:curso` deje de mostrar el aviso de tabla faltante.
+- Decidir la moderación de `materiales`: hoy la policy de update deja que el autor ponga `aprobado = true` en lo suyo, o sea que puede autoaprobarse. Está anotado en `supabase/materiales.sql`.
 - **Verificar en el navegador las pantallas con sesión** (Mis Cursos, detalle de curso, Perfil, onboarding): se rediseñaron con lint+build limpios, pero el preview no puede pasar el login.
 - Opcional: agregar códigos/créditos reales a las tarjetas.
