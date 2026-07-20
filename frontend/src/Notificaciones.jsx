@@ -2,16 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar.jsx';
 import { useUser } from './useUser';
+import { carrerasConMallaCompleta } from './data/mallaCurricular';
 import { Bell, UserCog, BookOpen, Map, CheckCheck } from 'lucide-react';
-
-// Carreras que hoy solo tienen ciclos 1-2 (ver CLAUDE.md).
-const CARRERAS_PENDIENTES = [
-  'Ingenieria Industrial',
-  'Marketing',
-  'Comunicaciones',
-  'Derecho',
-  'Ingenieria Ambiental',
-];
 
 // Genera las notificaciones a partir del estado local del usuario.
 function construirNotificaciones(meta) {
@@ -46,7 +38,7 @@ function construirNotificaciones(meta) {
     });
   }
 
-  if (meta.carrera && CARRERAS_PENDIENTES.includes(meta.carrera)) {
+  if (meta.carrera && !carrerasConMallaCompleta.includes(meta.carrera)) {
     notifs.push({
       id: `malla-pendiente-${meta.carrera}`,
       icono: Map,

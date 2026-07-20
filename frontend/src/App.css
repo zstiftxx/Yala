@@ -224,6 +224,12 @@
   border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; max-width: 520px;
 }
 .malla-panel strong { color: var(--shell-text); }
+.malla-panel-curso { min-width: 0; }
+.malla-panel-link {
+  display: block; margin-top: 2px; font-size: 12px; font-weight: 600;
+  color: var(--shell-accent); text-decoration: none;
+}
+.malla-panel-link:hover { text-decoration: underline; }
 .malla-panel-btns { display: flex; gap: 8px; margin-left: auto; }
 .malla-panel-btns button {
   padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer;

@@ -161,11 +161,19 @@ export function UserProvider({ children }) {
     const alSalir = () => {
       if (timerRef.current) guardarAhora();
     };
-    window.addEventListener('pagehide', alSalir);
-    document.addEventListener('visibilitychange', () => {
+    // El listener de visibilitychange se declara aparte para poder quitarlo:
+    // antes era una funcion anonima, asi que el cleanup solo desmontaba
+    // pagehide y cada re-registro del efecto dejaba un listener vivo.
+    const alOcultar = () => {
       if (document.visibilityState === 'hidden') alSalir();
-    });
-    return () => window.removeEventListener('pagehide', alSalir);
+    };
+
+    window.addEventListener('pagehide', alSalir);
+    document.addEventListener('visibilitychange', alOcultar);
+    return () => {
+      window.removeEventListener('pagehide', alSalir);
+      document.removeEventListener('visibilitychange', alOcultar);
+    };
   }, [guardarAhora]);
 
   const valor = {

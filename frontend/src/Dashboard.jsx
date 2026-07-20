@@ -4,7 +4,7 @@ import { useUser } from './useUser';
 import { cursosGeneralesPorCarrera, carreras } from './data/cursosGenerales';
 import { obtenerMallaCompleta, carrerasConMallaCompleta, cursosDisponibles } from './data/mallaCurricular';
 import Sidebar from './Sidebar.jsx';
-import { RefreshCw, Map, TrendingUp, BookCheck, CalendarClock, BookX, ArrowLeftRight, Info, Unlock } from 'lucide-react';
+import { BookOpen, Map, TrendingUp, BookCheck, CalendarClock, BookX, ArrowLeftRight, Info, Unlock } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -66,7 +66,12 @@ export default function Dashboard() {
               {guardado === 'guardando' ? 'Guardando...' : 'No se pudo guardar'}
             </span>
           )}
-          <button className="btn ghost"><RefreshCw size={16} /> Actualizar cursos</button>
+          {/* Antes habia aqui un boton "Actualizar cursos" sin onClick: no hacia
+              nada al tocarlo. Ahora lleva al catalogo, que es lo que la gente
+              buscaba al presionarlo. */}
+          <button className="btn" onClick={() => navigate('/mis-cursos')}>
+            <BookOpen size={16} /> Todos mis cursos
+          </button>
           <button className="btn primary" onClick={() => navigate('/mapa-curricular')}>
             <Map size={16} /> Ver mapa curricular
           </button>

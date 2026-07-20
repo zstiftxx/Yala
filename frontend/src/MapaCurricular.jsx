@@ -130,7 +130,12 @@ export default function MapaCurricular() {
         <>
           {seleccionado && (
             <div className="malla-panel">
-              <strong>{seleccionado}</strong>
+              <div className="malla-panel-curso">
+                <strong>{seleccionado}</strong>
+                <Link to={`/curso/${encodeURIComponent(seleccionado)}`} className="malla-panel-link">
+                  Ver materiales
+                </Link>
+              </div>
               <div className="malla-panel-btns">
                 {[['aprobado', 'Aprobado'], ['en_curso', 'En curso'], ['no_cursado', 'No cursado']].map(([val, txt]) => (
                   <button
@@ -187,7 +192,14 @@ export default function MapaCurricular() {
                 {malla[ciclo].map((curso) => (
                   <div
                     key={curso}
-                    ref={(el) => { cursoRefs.current[curso] = el; }}
+                    ref={(el) => {
+                      // Al desmontar (cambio de carrera) React llama con null:
+                      // sin borrar la entrada quedaria un nodo suelto en
+                      // cursoRefs y calcular() trazaria flechas hacia
+                      // coordenadas viejas.
+                      if (el) cursoRefs.current[curso] = el;
+                      else delete cursoRefs.current[curso];
+                    }}
                     className={claseCurso(curso)}
                     onClick={(e) => { e.stopPropagation(); setSeleccionado((prev) => (prev === curso ? null : curso)); }}
                   >
@@ -207,7 +219,12 @@ export default function MapaCurricular() {
         </>
       ) : (
         <div className="card">
-          <p>Todavía no tenemos la malla completa de {carrera}. Por ahora puedes ver tus cursos generales en el Dashboard.</p>
+          {/* obtenerMallaCompleta solo devuelve null cuando la carrera no existe
+              en los datos, y el unico caso real es que aun no eligieron una. */}
+          <p className="vacio">
+            Todavia no elegiste tu carrera, asi que no podemos armar tu mapa curricular.
+          </p>
+          <Link to="/carrera" className="btn primary vacio-accion">Elegir carrera</Link>
         </div>
       )}
     </Sidebar>
