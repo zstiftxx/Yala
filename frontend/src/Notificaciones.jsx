@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar.jsx';
+import { useUser } from './useUser';
 import { Bell, UserCog, BookOpen, Map, CheckCheck } from 'lucide-react';
 
 // Carreras que hoy solo tienen ciclos 1-2 (ver CLAUDE.md).
@@ -13,8 +14,7 @@ const CARRERAS_PENDIENTES = [
 ];
 
 // Genera las notificaciones a partir del estado local del usuario.
-function construirNotificaciones(usuario) {
-  const meta = usuario?.user_metadata || {};
+function construirNotificaciones(meta) {
   const estadoCursos = meta.estadoCursos || {};
   const enCurso = Object.values(estadoCursos).filter((e) => e === 'en_curso').length;
   const notifs = [];
@@ -60,8 +60,8 @@ function construirNotificaciones(usuario) {
 }
 
 export default function Notificaciones() {
-  const usuario = JSON.parse(localStorage.getItem('user') || 'null');
-  const notifs = construirNotificaciones(usuario);
+  const { metadata } = useUser();
+  const notifs = construirNotificaciones(metadata);
 
   const [leidas, setLeidas] = useState(() => {
     try {

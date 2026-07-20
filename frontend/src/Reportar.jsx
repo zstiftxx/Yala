@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import Sidebar from './Sidebar.jsx';
+import { useUser } from './useUser';
 import { AlertTriangle } from 'lucide-react';
 
 const TIPOS = [
@@ -13,8 +14,7 @@ const TIPOS = [
 
 export default function Reportar() {
   const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem('user') || 'null');
-  const carrera = usuario?.user_metadata?.carrera || null;
+  const { user: usuario, carrera } = useUser();
 
   const [tipo, setTipo] = useState('bug');
   const [mensaje, setMensaje] = useState('');
@@ -33,7 +33,7 @@ export default function Reportar() {
     const { error } = await supabase.from('reportes').insert({
       user_id: usuario?.id || null,
       email: usuario?.email || null,
-      carrera,
+      carrera: carrera || null,
       tipo,
       mensaje: mensaje.trim(),
     });

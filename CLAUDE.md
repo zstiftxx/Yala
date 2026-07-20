@@ -36,7 +36,12 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - **Confirmación de correo DESACTIVADA** en Supabase (2026-07-05) → el registro da sesión al instante y redirige. El toggle vive en *Authentication → Sign In / Providers → sección signups* (NO en el proveedor Email). Se apagó porque el email por defecto de Supabase tiene un rate limit bajísimo (~2-3/hora) y los correos de confirmación no llegaban, bloqueando a quienes probaban la app.
 - **`Login.jsx` rediseñado**: tarjeta centrada con marca, íconos en los campos (`lucide-react`), toggle de mostrar/ocultar contraseña, banner de mensaje tipado (error/success/info), estado `cargando` y toggle de tema propio. Reutiliza los tokens del shell: las variables CSS de `.app-shell` se comparten con `.auth-page` en `App.css`, así respeta el tema claro/oscuro.
 - El estado del usuario vive en **`user_metadata` de Supabase** y se espeja en `localStorage['user']`. Campos: `carrera`, `nombre`, `ciclo`, `estadoCursos`.
-- `RequireAuth` (en `App.jsx`) protege las rutas. Si una acción devuelve error de sesión, se limpia localStorage y se manda a `/`.
+- **`UserProvider.jsx` + `useUser.js` son la fuente única de ese estado.** Ninguna página debe parsear `localStorage['user']` ni llamar a `supabase.auth.updateUser` por su cuenta: se usa `useUser()`. El provider envuelve la app en `main.jsx`.
+  - `actualizarMetadata(parcial, { inmediato })` para perfil/carrera; `cambiarEstadoCurso(curso, estado)` para la malla.
+  - Los cambios se aplican en local al instante (optimista) y se **agrupan con debounce de 800 ms en una sola llamada** a `updateUser`. Marcar 40 cursos = 1 request, no 40. También se manda al ocultar/cerrar la pestaña.
+  - `guardado` (`limpio` / `guardando` / `error`) alimenta el indicador del topbar del Dashboard.
+- `RequireAuth` (en `App.jsx`) protege las rutas y lee del contexto: el provider verifica la sesión real contra Supabase (`getSession` + `onAuthStateChange`), no solo el espejo de localStorage. Si la sesión cae, se limpia y se manda a `/`.
+- **Ruta 404**: `NoEncontrado.jsx` en `path="*"`. No usa el shell porque puede llegar alguien sin sesión.
 - Tema claro/oscuro: toggle en el topbar, guardado en `localStorage['tema']`.
 
 ## Rutas
@@ -65,6 +70,7 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - **`Notificaciones.jsx`** (`/notificaciones`): notificaciones **derivadas del estado local** (no hay backend de notificaciones). Genera: bienvenida, "completa tu perfil" (si falta nombre/carrera/ciclo), "N cursos en curso", y "malla en construcción" si la carrera está en la lista de pendientes. Estado leído/no-leído en `localStorage['notif_leidas']`. La campana del topbar también lleva aquí.
 - **`Feedback.jsx`** (`/feedback`) y **`Reportar.jsx`** (`/reportar`): formularios (tipo + mensaje) que **insertan en Supabase** (tablas `feedback` y `reportes`). Manejan sin sesión → limpian localStorage y van a `/`; si la tabla no existe (código `42P01`) muestran aviso pidiendo correr el SQL. Reportar guarda también la `carrera`.
 - **SQL de las tablas** en `supabase/tablas.sql` — correr **una vez** en Supabase → SQL Editor. Crea `feedback` y `reportes` con RLS (insert/select solo del propio `user_id`; tú ves todo desde el Table editor, que ignora RLS). **Pendiente hasta que se corra ese SQL los envíos fallan con el aviso.**
+- **`supabase/materiales.sql`** — tabla `materiales` (apuntes/resúmenes/exámenes por curso) para el objetivo central de la app. `user_metadata` no sirve para esto: es por usuario, no compartido. Material = **enlace**, no archivo subido (sin Storage por ahora). El curso se identifica por nombre, igual que `estadoCursos`. **Aún no se corrió y la app todavía no lo lee**: `/curso/:curso` sigue siendo stub.
 
 ## Pendientes / ideas futuras
 - Correr `supabase/tablas.sql` en Supabase para que Feedback/Reportar guarden de verdad.

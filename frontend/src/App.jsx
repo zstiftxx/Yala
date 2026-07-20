@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useUser } from './useUser';
 import Login from './Login.jsx';
 import Dashboard from './Dashboard.jsx';
 import SeleccionCarrera from './SeleccionCarrera.jsx';
@@ -9,16 +10,19 @@ import CursoDetalle from './CursoDetalle.jsx';
 import Notificaciones from './Notificaciones.jsx';
 import Feedback from './Feedback.jsx';
 import Reportar from './Reportar.jsx';
+import NoEncontrado from './NoEncontrado.jsx';
 import './App.css';
 
+// La sesion real vive en Supabase; localStorage['user'] es solo un espejo que
+// puede quedar viejo (sesion expirada, logout en otra pestania, alguien que
+// escribe la clave a mano). UserProvider la verifica contra Supabase; aca solo
+// se espera su veredicto.
 function RequireAuth({ children }) {
-  try {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) return <Navigate to="/" replace />;
-    return children;
-  } catch (err) {
-    return <Navigate to="/" replace />;
-  }
+  const { user, cargandoSesion } = useUser();
+
+  if (cargandoSesion) return <div className="auth-page">Cargando...</div>;
+  if (!user) return <Navigate to="/" replace />;
+  return children;
 }
 
 function App() {
@@ -36,6 +40,8 @@ function App() {
       <Route path="/notificaciones" element={<RequireAuth><Notificaciones /></RequireAuth>} />
       <Route path="/feedback" element={<RequireAuth><Feedback /></RequireAuth>} />
       <Route path="/reportar" element={<RequireAuth><Reportar /></RequireAuth>} />
+      {/* Cualquier otra ruta */}
+      <Route path="*" element={<NoEncontrado />} />
     </Routes>
   );
 }

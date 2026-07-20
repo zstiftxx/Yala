@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { useUser } from './useUser';
 import { carreras } from './data/cursosGenerales';
 
 export default function SeleccionCarrera() {
   const navigate = useNavigate();
+  const { actualizarMetadata } = useUser();
   const [carrera, setCarrera] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -19,23 +20,8 @@ export default function SeleccionCarrera() {
     setGuardando(true);
     setMensaje('');
 
-    const { data, error } = await supabase.auth.updateUser({
-      data: { carrera },
-    });
-
-    if (error) {
-      if (error.message.toLowerCase().includes('session')) {
-        // La sesión ya no es válida (expiró o nunca se confirmó el correo)
-        localStorage.removeItem('user');
-        navigate('/');
-        return;
-      }
-      setMensaje('Error: ' + error.message);
-      setGuardando(false);
-      return;
-    }
-
-    localStorage.setItem('user', JSON.stringify(data.user));
+    // Si la sesion ya no es valida, el contexto la limpia y RequireAuth manda a /.
+    await actualizarMetadata({ carrera }, { inmediato: true });
     navigate('/home');
   };
 

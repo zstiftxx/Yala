@@ -1,28 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { useUser } from './useUser';
 import { cursosGeneralesPorCarrera, carreras } from './data/cursosGenerales';
 import { obtenerMallaCompleta, carrerasConMallaCompleta, cursosDisponibles } from './data/mallaCurricular';
 import Sidebar from './Sidebar.jsx';
 import { RefreshCw, Map, TrendingUp, BookCheck, CalendarClock, BookX, ArrowLeftRight, Info, Unlock } from 'lucide-react';
 
-function estadoInicialDesde(metadata) {
-  if (metadata?.estadoCursos) return metadata.estadoCursos;
-  // Compatibilidad con el modelo anterior (solo aprobado/no cursado)
-  const previo = {};
-  (metadata?.cursosAprobados || []).forEach((curso) => {
-    previo[curso] = 'aprobado';
-  });
-  return previo;
-}
-
 export default function Dashboard() {
   const navigate = useNavigate();
-  const usuarioGuardado = JSON.parse(localStorage.getItem('user') || 'null');
-  const [carrera, setCarrera] = useState(usuarioGuardado?.user_metadata?.carrera || 'Tu carrera');
+  const { estadoCursos, cambiarEstadoCurso, actualizarMetadata, carrera: carreraGuardada, guardado } = useUser();
+  const carrera = carreraGuardada || 'Tu carrera';
   const cursosGenerales = cursosGeneralesPorCarrera[carrera];
 
-  const [estadoCursos, setEstadoCursos] = useState(estadoInicialDesde(usuarioGuardado?.user_metadata));
   const [cambiandoCarrera, setCambiandoCarrera] = useState(false);
 
   // El progreso se calcula sobre la malla completa (todos los ciclos), no solo
@@ -38,62 +27,16 @@ export default function Dashboard() {
   const { disponibles, sinDatos } = cursosDisponibles(carrera, estadoCursos);
   const progreso = totalCursos > 0 ? Math.round((aprobadosCount / totalCursos) * 100) : 0;
 
-  const cambiarEstado = async (curso, nuevoEstado) => {
-    const anterior = estadoCursos;
-    const nuevo = { ...anterior };
-    if (nuevoEstado === 'no_cursado') {
-      delete nuevo[curso];
-    } else {
-      nuevo[curso] = nuevoEstado;
-    }
-
-    setEstadoCursos(nuevo);
-
-    const { data, error } = await supabase.auth.updateUser({
-      data: { estadoCursos: nuevo },
-    });
-
-    if (error) {
-      if (error.message.toLowerCase().includes('session')) {
-        localStorage.removeItem('user');
-        navigate('/');
-        return;
-      }
-      setEstadoCursos(anterior); // revertir si falló el guardado
-      return;
-    }
-
-    localStorage.setItem('user', JSON.stringify(data.user));
-  };
-
   const cambiarCarrera = async (nuevaCarrera) => {
-    const anterior = carrera;
-    setCarrera(nuevaCarrera);
     setCambiandoCarrera(true);
-
-    const { data, error } = await supabase.auth.updateUser({
-      data: { carrera: nuevaCarrera },
-    });
-
-    if (error) {
-      if (error.message.toLowerCase().includes('session')) {
-        localStorage.removeItem('user');
-        navigate('/');
-        return;
-      }
-      setCarrera(anterior);
-      setCambiandoCarrera(false);
-      return;
-    }
-
-    localStorage.setItem('user', JSON.stringify(data.user));
+    await actualizarMetadata({ carrera: nuevaCarrera }, { inmediato: true });
     setCambiandoCarrera(false);
   };
 
   const selectorEstado = (curso) => (
     <select
       value={estadoCursos[curso] || 'no_cursado'}
-      onChange={(e) => cambiarEstado(curso, e.target.value)}
+      onChange={(e) => cambiarEstadoCurso(curso, e.target.value)}
       className="estado-curso-select"
     >
       <option value="no_cursado">No cursado</option>
@@ -118,6 +61,11 @@ export default function Dashboard() {
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
+          {guardado !== 'limpio' && (
+            <span className={`guardado-estado ${guardado}`}>
+              {guardado === 'guardando' ? 'Guardando...' : 'No se pudo guardar'}
+            </span>
+          )}
           <button className="btn ghost"><RefreshCw size={16} /> Actualizar cursos</button>
           <button className="btn primary" onClick={() => navigate('/mapa-curricular')}>
             <Map size={16} /> Ver mapa curricular

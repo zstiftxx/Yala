@@ -99,6 +99,10 @@
 }
 
 .main-area { flex: 1; min-width: 0; padding: 24px 28px; box-sizing: border-box }
+/* Indicador del guardado por lote (ver UserContext.jsx) */
+.guardado-estado { font-size: 13px; color: var(--shell-text-muted); }
+.guardado-estado.error { color: #dc2626; }
+
 .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
 .topbar h1 { margin: 0; color: var(--shell-text); font-size: 22px; }
 .top-actions { display: flex; align-items: center; gap: 12px; }

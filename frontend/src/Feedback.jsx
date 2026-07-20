@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import Sidebar from './Sidebar.jsx';
+import { useUser } from './useUser';
 import { Send } from 'lucide-react';
 
 const TIPOS = [
@@ -13,7 +14,7 @@ const TIPOS = [
 
 export default function Feedback() {
   const navigate = useNavigate();
-  const usuario = JSON.parse(localStorage.getItem('user') || 'null');
+  const { user: usuario } = useUser();
 
   const [tipo, setTipo] = useState('sugerencia');
   const [mensaje, setMensaje] = useState('');

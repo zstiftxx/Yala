@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
 import Sidebar from './Sidebar.jsx';
+import { useUser } from './useUser';
 import { carreras } from './data/cursosGenerales';
 
 export default function Perfil() {
-  const navigate = useNavigate();
-  const usuarioGuardado = JSON.parse(localStorage.getItem('user') || 'null');
-  const [nombre, setNombre] = useState(usuarioGuardado?.user_metadata?.nombre || '');
-  const [carrera, setCarrera] = useState(usuarioGuardado?.user_metadata?.carrera || '');
-  const [ciclo, setCiclo] = useState(usuarioGuardado?.user_metadata?.ciclo || '');
+  const { user, nombre: nombreGuardado, carrera: carreraGuardada, ciclo: cicloGuardado, actualizarMetadata } = useUser();
+  // Copia local del formulario: solo se sincroniza al contexto al enviar.
+  const [nombre, setNombre] = useState(nombreGuardado);
+  const [carrera, setCarrera] = useState(carreraGuardada);
+  const [ciclo, setCiclo] = useState(cicloGuardado);
   const [mensaje, setMensaje] = useState('');
   const [guardando, setGuardando] = useState(false);
 
@@ -17,23 +16,7 @@ export default function Perfil() {
     e.preventDefault();
     setGuardando(true);
     setMensaje('');
-
-    const { data, error } = await supabase.auth.updateUser({
-      data: { nombre, carrera, ciclo },
-    });
-
-    if (error) {
-      if (error.message.toLowerCase().includes('session')) {
-        localStorage.removeItem('user');
-        navigate('/');
-        return;
-      }
-      setMensaje('Error: ' + error.message);
-      setGuardando(false);
-      return;
-    }
-
-    localStorage.setItem('user', JSON.stringify(data.user));
+    await actualizarMetadata({ nombre, carrera, ciclo }, { inmediato: true });
     setMensaje('Perfil actualizado.');
     setGuardando(false);
   };
@@ -50,7 +33,7 @@ export default function Perfil() {
             Correo
             <input
               type="email"
-              value={usuarioGuardado?.email || ''}
+              value={user?.email || ''}
               disabled
               style={{ padding: '10px', width: '100%', fontSize: '16px', marginTop: '5px', boxSizing: 'border-box' }}
             />

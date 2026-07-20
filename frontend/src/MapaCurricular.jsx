@@ -1,20 +1,17 @@
 import { useState, useMemo, useLayoutEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { supabase } from './supabaseClient';
 import Sidebar from './Sidebar.jsx';
+import { useUser } from './useUser';
 import { obtenerMallaCompleta, obtenerPrerequisitos } from './data/mallaCurricular';
 
 export default function MapaCurricular() {
-  const navigate = useNavigate();
-  // Se parsea una sola vez para tener referencias estables entre renders.
-  const [usuarioGuardado] = useState(() => JSON.parse(localStorage.getItem('user') || 'null'));
-  const carrera = usuarioGuardado?.user_metadata?.carrera || 'Tu carrera';
+  const { carrera: carreraGuardada, estadoCursos, cambiarEstadoCurso } = useUser();
+  const carrera = carreraGuardada || 'Tu carrera';
   const malla = useMemo(() => obtenerMallaCompleta(carrera), [carrera]);
   const prereqs = useMemo(() => obtenerPrerequisitos(carrera), [carrera]);
   const ciclos = malla ? Object.keys(malla).map(Number).sort((a, b) => a - b) : [];
 
-  const [estadoCursos, setEstadoCursos] = useState(() => usuarioGuardado?.user_metadata?.estadoCursos || {});
   const [seleccionado, setSeleccionado] = useState(null);
 
   const gridRef = useRef(null);
@@ -87,26 +84,6 @@ export default function MapaCurricular() {
     return () => { clearTimeout(t); window.removeEventListener('resize', calcular); };
   }, [calcular, carrera]);
 
-  const cambiarEstado = async (curso, nuevoEstado) => {
-    const anterior = estadoCursos;
-    const nuevo = { ...anterior };
-    if (nuevoEstado === 'no_cursado') delete nuevo[curso];
-    else nuevo[curso] = nuevoEstado;
-    setEstadoCursos(nuevo);
-
-    const { data, error } = await supabase.auth.updateUser({ data: { estadoCursos: nuevo } });
-    if (error) {
-      if (error.message.toLowerCase().includes('session')) {
-        localStorage.removeItem('user');
-        navigate('/');
-        return;
-      }
-      setEstadoCursos(anterior);
-      return;
-    }
-    localStorage.setItem('user', JSON.stringify(data.user));
-  };
-
   const construirPath = ({ x1, y1, x2, y2 }) => {
     const dx = Math.max(24, (x2 - x1) * 0.4);
     return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
@@ -159,7 +136,7 @@ export default function MapaCurricular() {
                   <button
                     key={val}
                     className={(estadoCursos[seleccionado] || 'no_cursado') === val ? 'activo' : ''}
-                    onClick={() => cambiarEstado(seleccionado, val)}
+                    onClick={() => cambiarEstadoCurso(seleccionado, val)}
                   >
                     {txt}
                   </button>

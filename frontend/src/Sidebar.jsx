@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { useUser } from './useUser';
 import { useEsMovil } from './useEsMovil';
 import { LayoutGrid, Bell, BookOpen, MessageSquare, User, LogOut, Moon, Sun, AlertTriangle } from 'lucide-react';
 
@@ -58,8 +58,8 @@ function TabBar({ active }) {
 export default function Sidebar({ active, children, sinNav }) {
   const navigate = useNavigate();
   const esMovil = useEsMovil();
-  const usuarioGuardado = JSON.parse(localStorage.getItem('user') || 'null');
-  const nombre = usuarioGuardado?.user_metadata?.nombre || usuarioGuardado?.email || 'Estudiante';
+  const { user, nombre: nombreGuardado, cerrarSesion } = useUser();
+  const nombre = nombreGuardado || user?.email || 'Estudiante';
   const inicial = (nombre || '?').charAt(0).toUpperCase();
 
   const [tema, setTema] = useState(localStorage.getItem('tema') || 'light');
@@ -71,8 +71,7 @@ export default function Sidebar({ active, children, sinNav }) {
   };
 
   const manejarLogout = async () => {
-    try { await supabase.auth.signOut(); } catch (e) {}
-    localStorage.removeItem('user');
+    await cerrarSesion();
     navigate('/');
   };
 

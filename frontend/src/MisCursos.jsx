@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar.jsx';
+import { useUser } from './useUser';
 import { cursosGeneralesPorCarrera } from './data/cursosGenerales';
 import { obtenerMallaCompleta } from './data/mallaCurricular';
 
 export default function MisCursos() {
-  const usuarioGuardado = JSON.parse(localStorage.getItem('user') || 'null');
-  const carrera = usuarioGuardado?.user_metadata?.carrera || '';
-  const estadoCursos = usuarioGuardado?.user_metadata?.estadoCursos || {};
+  const { carrera, estadoCursos } = useUser();
 
   const malla = obtenerMallaCompleta(carrera) || cursosGeneralesPorCarrera[carrera];
   const todosLosCursos = malla ? Object.values(malla).flat() : [];
