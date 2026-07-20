@@ -128,6 +128,16 @@ export function obtenerMallaCompleta(carrera) {
   return { ...generales, ...avanzados };
 }
 
+// Ciclo en el que la malla de la carrera ubica un curso, o null si ese curso no
+// pertenece a la malla (URL escrita a mano, o carrera cambiada despues de
+// marcar cursos de la anterior).
+export function cicloDeCurso(carrera, curso) {
+  const malla = obtenerMallaCompleta(carrera);
+  if (!malla) return null;
+  const encontrado = Object.entries(malla).find(([, cursos]) => cursos.includes(curso));
+  return encontrado ? Number(encontrado[0]) : null;
+}
+
 // Cursos que el alumno puede llevar ahora: los que aun no aprobo ni esta llevando
 // y cuyos prerrequisitos estan todos aprobados.
 //
