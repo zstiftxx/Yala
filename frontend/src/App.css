@@ -271,6 +271,22 @@ textarea.form-input { resize: vertical; }
 .chip.estatico { cursor: default; padding: 2px 8px; font-size: 12px; }
 .filtros { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
 
+/* ---- Buscador y catalogo de cursos ---- */
+.buscador { position: relative; display: flex; align-items: center; max-width: 420px; margin-bottom: 14px; }
+.buscador-icono { position: absolute; left: 12px; color: var(--shell-text-muted); pointer-events: none; }
+.buscador .form-input { margin-top: 0; padding-left: 36px; background: var(--shell-surface); }
+
+.ciclo-bloque { margin-bottom: 16px; }
+.ciclo-bloque h3 { margin: 0 0 12px; font-size: 15px; color: var(--shell-text-muted); }
+.curso-enlace {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--shell-text); text-decoration: none; font-weight: 500;
+  min-width: 0; overflow-wrap: anywhere;
+}
+.curso-enlace:hover { color: var(--shell-accent); }
+.curso-enlace svg { flex-shrink: 0; color: var(--shell-text-muted); }
+.vacio-accion { margin-top: 12px; }
+
 /* ---- Detalle de curso / materiales ---- */
 .curso-chips { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
 .curso-prereqs { font-size: 13px; color: var(--shell-text-muted); }
