@@ -24,12 +24,14 @@ export default function Perfil() {
 
   return (
     <Sidebar active="perfil">
-      <header className="topbar">
-        <h1>Mi Perfil</h1>
+      <header className="page-head">
+        <div className="page-head-texto">
+          <h1>Mi Perfil</h1>
+          <p className="page-intro">
+            Estos datos personalizan tu Dashboard y las notificaciones.
+          </p>
+        </div>
       </header>
-      <p className="page-intro">
-        Estos datos personalizan tu Dashboard y las notificaciones.
-      </p>
 
       <section className="card form-estrecho">
         <form onSubmit={manejarGuardar} className="form-col">

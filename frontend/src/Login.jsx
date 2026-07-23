@@ -63,7 +63,7 @@ function Login() {
   };
 
   return (
-    <div className="auth-page" data-theme={tema}>
+    <div className="auth-page">
       <button className="auth-theme-toggle" onClick={alternarTema} title="Cambiar tema" type="button">
         {tema === 'light' ? <Moon size={18} /> : <Sun size={18} />}
       </button>

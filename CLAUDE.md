@@ -43,7 +43,26 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
   - `guardado` (`limpio` / `guardando` / `error`) alimenta el indicador del topbar del Dashboard.
 - `RequireAuth` (en `App.jsx`) protege las rutas y lee del contexto: el provider verifica la sesión real contra Supabase (`getSession` + `onAuthStateChange`), no solo el espejo de localStorage. Si la sesión cae, se limpia y se manda a `/`.
 - **Ruta 404**: `NoEncontrado.jsx` en `path="*"`. No usa el shell porque puede llegar alguien sin sesión.
-- Tema claro/oscuro: toggle en el topbar, guardado en `localStorage['tema']`.
+- Tema claro/oscuro: toggle en el topbar, guardado en `localStorage['tema']`. El atributo `data-theme` va en **`<html>`**, no en el contenedor de cada pantalla: así el fondo también pinta `<body>`. `index.html` lo aplica con un script inline antes de que React monte, para que no haya flash blanco al cargar en oscuro; `useTema.js` lo mantiene sincronizado junto con el `<meta name="theme-color">`.
+
+## Sistema de diseño (2026-07-23)
+
+Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los tokens están en `frontend/src/index.css`.
+
+- **Grises cálidos** (con algo de rojo/amarillo), no el gris azulado por defecto: al lado del naranja, el gris frío se ve sucio.
+- **Tres naranjas, cada uno con su trabajo.** El naranja de marca `#f2670a` da 3.1:1 sobre blanco y AA pide 4.5:1, así que **nunca lleva texto**:
+  - `--shell-accent` — forma pura (anillo de progreso, bordes, el punto de notificación).
+  - `--shell-accent-fuerte` — texto naranja sobre fondo claro.
+  - `--shell-accent-solido` + `--shell-accent-texto` — fondo de botón y su texto. En oscuro se invierten (naranja claro de fondo, texto oscuro encima).
+- Escalas `--fs-*` (tipografía), `--sp-*` (espaciado), `--r-*` (radios, más redondeados a propósito) y `--sombra-*` (tintadas de marrón, no negro puro). **Usarlas en vez de px sueltos.**
+- `--topbar-h` la comparten la topbar sticky y el nav lateral que se cuelga debajo.
+- **Todos los pares de color pasan AA (≥4.5:1) en ambos temas.** Al tocar un color, volver a medirlo: es fácil romperlo sin notarlo.
+
+### Piezas nuevas
+- **`EstadoCurso.jsx`** — reemplaza los `<select>` de estado en Dashboard, MisCursos y CursoDetalle. Un toque avanza al siguiente estado (no_cursado → en_curso → aprobado); las flechas del teclado también recorren. Un select de 3 opciones costaba 3 toques en móvil y no se podía estilar. **Conserva su texto incluso a 375px**: el color solo no comunica el estado, y quien no distingue verde de azul se quedaba sin pista.
+- **`AnilloProgreso.jsx`** — el anillo SVG del héroe del Dashboard. Sin librería de gráficos: es un círculo con `stroke-dasharray`.
+- **`.curso-fila` + `.lista-filas`** — el patrón de lista de cursos. Filas separadas por una línea, no tarjetas dentro de tarjetas.
+- **`.page-head`** (con `.page-head-texto` / `.page-head-acciones`) reemplazó al viejo `.topbar` de las páginas.
 
 ## Rutas
 `/` Login · `/carrera` onboarding de carrera · `/home` Dashboard · `/perfil` · `/mis-cursos` · `/curso/:curso` · `/mapa-curricular` · `/notificaciones` · `/feedback` · `/reportar`.
@@ -52,10 +71,15 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - **`Sidebar.jsx`** = shell de la app (topbar + nav + contenido); prop `sinNav` oculta el nav lateral (lo usa el mapa curricular).
 - **`useTema.js`** — el toggle claro/oscuro. Lo usan Login, Sidebar, NoEncontrado y SeleccionCarrera; no duplicar ese `localStorage['tema']` en páginas nuevas.
 - **`FormularioMensaje.jsx`** — Feedback y Reportar son el mismo formulario (tipo + mensaje + insert en Supabase) y solo pasan textos. Si aparece un tercer formulario de ese estilo, va por aquí.
-- **Estilos**: las clases compartidas viven en `App.css` (`form-input`, `form-label`, `form-col`, `page-intro`, `vacio`, `chip`, `filtros`, `buscador`). **No** meter estilos inline nuevos ni colores hardcodeados: todo sale de las variables `--shell-*`, que son las que hacen funcionar el modo oscuro.
+- **Estilos**: los **tokens** viven en `index.css` (`:root` y `:root[data-theme='dark']`); los **componentes** en `App.css`. **No** meter estilos inline nuevos ni colores hardcodeados: todo sale de los tokens, que son los que hacen funcionar el modo oscuro. Ver "Sistema de diseño" más abajo.
 - **Estados de curso**: 3 valores — `no_cursado` / `en_curso` / `aprobado` — en `estadoCursos` (objeto `curso -> estado`). El Dashboard calcula Progreso/Aprobados/En curso/No cursados de ahí.
 - **`MisCursos.jsx`** = catálogo de toda la malla agrupado por ciclo, con buscador (compara sin tildes) y filtros por estado. Es la puerta de entrada a `/curso/:curso`.
-- **`MapaCurricular.jsx`**: grilla por ciclos (encaja sin scroll), flechas SVG de prerrequisito, clic en un curso resalta su camino (prereqs + dependientes), panel para cambiar estado.
+- **`MapaCurricular.jsx`**: grilla por ciclos, flechas SVG de prerrequisito, clic en un curso resalta su camino (prereqs + dependientes), panel para cambiar estado.
+  - **Ya NO comprime los ciclos para que entren todos**: cada columna tiene un mínimo de 132px y el mapa se **desliza en horizontal**. Con 10 ciclos en un teléfono, "que entre todo" significaba columnas de ~30px. El scroll vive en el propio `.malla-grid`, no en la página.
+  - Las flechas son **ortogonales** (sale, baja por su canal, entra) con las esquinas redondeadas, no curvas en S. Cada una baja por el hueco anterior a su columna destino, y las que comparten destino se reparten en abanico dentro de ese hueco.
+  - **Dato medido, por si se quiere revisar**: el trazado ortogonal cruza *más* que el bezier anterior (44 pares vs 35 en Ing. de Sistemas). Se eligió igual porque los cruces en ángulo recto se siguen con la vista mucho mejor que las diagonales en ángulos arbitrarios. Si se quiere volver atrás, el cambio está aislado en `construirPath`.
+  - Las coordenadas del SVG son del **contenido**, no de lo visible: `calcular()` vuelve a sumar `scrollLeft/scrollTop` a lo que devuelve `getBoundingClientRect`. Verificado que un recálculo con el mapa desplazado no mueve las flechas.
+  - Sin nada seleccionado las flechas van a opacidad baja (0.22 / 0.55): con ~40 a la vez son el fondo del mapa, no el contenido. Al tocar un curso, su camino sube a 1.
 
 ## Datos de mallas (`frontend/src/data/`)
 - **`cursosGenerales.js`** — ciclos 1-2 (generales) de las 14 carreras. **Fuente de verdad de los generales**: aunque un PDF viejo difiera, se conservan estos.
@@ -89,5 +113,5 @@ graphify query "<pregunta>" --budget 800    # traversal mas amplio, con tope
 - Decidir el nombre de la app.
 - Mallas actualizadas de las 5 carreras pendientes.
 - Decidir la moderación de `materiales`: hoy la policy de update deja que el autor ponga `aprobado = true` en lo suyo, o sea que puede autoaprobarse. Está anotado en `supabase/materiales.sql`.
-- **Verificar en el navegador las pantallas con sesión** (Mis Cursos, detalle de curso, Perfil, onboarding): se rediseñaron con lint+build limpios, pero el preview no puede pasar el login.
+- **Verificar en el navegador las pantallas con sesión** (Mis Cursos, detalle de curso, Perfil, onboarding): el preview no puede pasar el login. El rediseño se verificó inyectando el markup equivalente en el DOM, lo que valida el CSS pero **no** que cada componente lo produzca igual. El mapa curricular no se revisó en pantalla.
 - Opcional: agregar códigos/créditos reales a las tarjetas.

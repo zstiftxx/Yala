@@ -1,9 +1,115 @@
+/* Los tokens de color viven aca, en :root, y no en el contenedor de cada
+   pantalla. Asi el fondo del tema tambien pinta <html> y <body>, que es lo que
+   se ve cuando el shell no llega a cubrir toda la ventana: el rebote del scroll
+   en movil y la franja que queda al esconder el navegador su barra de URL. */
 :root {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* ---- Color ----
+     Los grises son calidos (tienen algo de rojo/amarillo), no el gris azulado
+     de siempre: al lado del naranja de la marca el gris frio se ve sucio. */
+  --shell-bg: #faf8f5;
+  --shell-surface: #ffffff;
+  --shell-surface-2: #f5f1ec; /* fondo hundido: filas dentro de una tarjeta */
+  --shell-border: #ebe4dc;
+  --shell-text: #1c1917;
+  --shell-text-muted: #6b625c;
+  /* El naranja de la marca es demasiado claro para poner texto encima o
+     debajo: #f2670a sobre blanco da 3.1:1 y AA pide 4.5:1. Por eso hay tres
+     tonos y cada uno tiene un trabajo.
+       --shell-accent        forma, nunca texto (el anillo, bordes, el punto)
+       --shell-accent-fuerte texto naranja sobre fondo claro (5.4:1)
+       --shell-accent-solido fondo de boton, con --shell-accent-texto encima */
+  --shell-accent: #f2670a;
+  --shell-accent-fuerte: #b8440a;
+  --shell-accent-solido: #b8440a;
+  --shell-accent-texto: #ffffff;
+  --shell-accent-bg: #fff0e4;
+  --shell-green-bg: #e7f6ec;
+  --shell-green-text: #0f7034;
+  --shell-blue-bg: #e9f1fe;
+  --shell-blue-text: #1d4ed8;
+  --shell-gray-bg: #f1ede8;
+  --shell-gray-text: #6b625c;
+
+  /* ---- Escala tipografica ----
+     Antes cada regla elegia su px a ojo (13/14/15/20/22...). Con la escala los
+     tamanos se repiten y la pantalla se lee como una sola cosa. */
+  --fs-xs: 0.75rem;    /* 12px - metadatos */
+  --fs-sm: 0.8125rem;  /* 13px - texto secundario */
+  --fs-base: 0.875rem; /* 14px - cuerpo */
+  --fs-md: 0.9375rem;  /* 15px - inputs */
+  --fs-lg: 1.0625rem;  /* 17px - titulos de tarjeta */
+  --fs-xl: 1.375rem;   /* 22px - titulo de pagina */
+  --fs-2xl: 1.75rem;   /* 28px - cifras destacadas */
+  --fs-3xl: 2.5rem;    /* 40px - el porcentaje del heroe */
+
+  /* ---- Espaciado ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  /* ---- Radios ----
+     Mas redondeado que antes a proposito: es la mitad del caracter "calido". */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-full: 999px;
+
+  /* ---- Sombras ----
+     Tintadas de marron y no de negro puro, para que no ensucien el crema. */
+  --sombra-sm: 0 1px 2px rgba(68, 46, 28, 0.06);
+  --sombra-md: 0 2px 8px rgba(68, 46, 28, 0.07);
+  --sombra-lg: 0 12px 32px rgba(68, 46, 28, 0.12);
+
+  /* Area segura del notch/gestos en movil, para no repetir el env() suelto. */
+  --safe-b: env(safe-area-inset-bottom, 0px);
+
+  /* La topbar es sticky y el nav lateral se cuelga justo debajo. Los dos leen
+     esta altura: si se pusiera a mano en cada uno, cambiar el padding de la
+     topbar dejaria al nav corrido y con scroll de mas. */
+  --topbar-h: 61px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --shell-bg: #14120f;
+  --shell-surface: #1e1b18;
+  --shell-surface-2: #262220;
+  --shell-border: #322c28;
+  --shell-text: #ede9e6;
+  --shell-text-muted: #a8a29e;
+  --shell-accent: #ff8534;
+  --shell-accent-fuerte: #ff8534;
+  /* En oscuro se invierte: el naranja claro es el fondo y el texto va oscuro,
+     porque blanco sobre #ff8534 da 2.4:1. */
+  --shell-accent-solido: #ff8534;
+  --shell-accent-texto: #14120f;
+  --shell-accent-bg: #3b2415;
+  --shell-green-bg: #16281d;
+  --shell-green-text: #4ade80;
+  --shell-blue-bg: #17233a;
+  --shell-blue-text: #7aa7f8;
+  --shell-gray-bg: #262220;
+  --shell-gray-text: #a8a29e;
+
+  --sombra-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sombra-md: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --sombra-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+  /* Hace que el navegador pinte de oscuro lo que no controlamos: la barra de
+     scroll, los <select> nativos y el fondo del rebote. */
+  color-scheme: dark;
 }
 
 * {
@@ -14,9 +120,26 @@ html,
 body,
 #root {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100%;
+  background: var(--shell-bg);
+  color: var(--shell-text);
 }
 
 #root {
   width: 100%;
+}
+
+/* Los titulos apretados se leen mas modernos; por defecto system-ui los deja
+   muy sueltos en tamanos grandes. */
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Quien tenga activado "reducir movimiento" no deberia ver ninguna transicion
+   de las que agrega el rediseno. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

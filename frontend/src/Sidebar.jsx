@@ -72,7 +72,7 @@ export default function Sidebar({ active, children, sinNav }) {
   const conTabBar = esMovil && !sinNav;
 
   return (
-    <div className="app-shell" data-theme={tema}>
+    <div className="app-shell">
       <header className="app-topbar">
         <Link to="/home" className="app-brand">Educateca</Link>
         <div className="app-topbar-actions">

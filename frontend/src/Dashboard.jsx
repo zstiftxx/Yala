@@ -1,16 +1,26 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from './useUser';
 import { cursosGeneralesPorCarrera, carreras } from './data/cursosGenerales';
 import { obtenerMallaCompleta, carrerasConMallaCompleta, cursosDisponibles } from './data/mallaCurricular';
 import Sidebar from './Sidebar.jsx';
-import { BookOpen, Map, TrendingUp, BookCheck, CalendarClock, BookX, ArrowLeftRight, Info, Unlock } from 'lucide-react';
+import EstadoCurso from './EstadoCurso.jsx';
+import AnilloProgreso from './AnilloProgreso.jsx';
+import { BookOpen, Map, BookCheck, CalendarClock, BookX, Info, Unlock, ChevronRight } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { estadoCursos, cambiarEstadoCurso, actualizarMetadata, carrera: carreraGuardada, guardado } = useUser();
+  const {
+    estadoCursos,
+    cambiarEstadoCurso,
+    actualizarMetadata,
+    carrera: carreraGuardada,
+    nombre,
+    guardado,
+  } = useUser();
   const carrera = carreraGuardada || 'Tu carrera';
   const cursosGenerales = cursosGeneralesPorCarrera[carrera];
+  const primerNombre = (nombre || '').trim().split(' ')[0];
 
   const [cambiandoCarrera, setCambiandoCarrera] = useState(false);
 
@@ -33,34 +43,27 @@ export default function Dashboard() {
     setCambiandoCarrera(false);
   };
 
-  const selectorEstado = (curso) => (
-    <select
-      value={estadoCursos[curso] || 'no_cursado'}
-      onChange={(e) => cambiarEstadoCurso(curso, e.target.value)}
-      className="estado-curso-select"
-    >
-      <option value="no_cursado">No cursado</option>
-      <option value="en_curso">En curso</option>
-      <option value="aprobado">Aprobado</option>
-    </select>
+  const filaCurso = (curso) => (
+    <div key={curso} className="curso-fila">
+      <Link to={`/curso/${encodeURIComponent(curso)}`} className="curso-enlace">
+        {curso}
+      </Link>
+      <EstadoCurso
+        curso={curso}
+        estado={estadoCursos[curso] || 'no_cursado'}
+        onCambiar={(valor) => cambiarEstadoCurso(curso, valor)}
+      />
+    </div>
   );
 
   return (
     <Sidebar active="dashboard">
-      <header className="topbar">
-        <h1>{carrera}</h1>
-        <div className="top-actions">
-          <ArrowLeftRight size={16} />
-          <select
-            value={carrera}
-            onChange={(e) => cambiarCarrera(e.target.value)}
-            disabled={cambiandoCarrera}
-            className="estado-curso-select"
-          >
-            {carreras.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+      <header className="page-head">
+        <div className="page-head-texto">
+          {primerNombre && <p className="page-eyebrow">Hola, {primerNombre}</p>}
+          <h1>{carrera}</h1>
+        </div>
+        <div className="page-head-acciones">
           {guardado !== 'limpio' && (
             <span className={`guardado-estado ${guardado}`}>
               {guardado === 'guardando' ? 'Guardando...' : 'No se pudo guardar'}
@@ -78,22 +81,37 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <section className="overview">
-        <div className="stat-card progress">
-          <div className="icon-row"><TrendingUp size={18} /> {progreso}%</div>
-          <div className="label">Progreso</div>
-        </div>
-        <div className="stat-card green">
-          <div className="icon-row"><BookCheck size={18} /> {aprobadosCount}/{totalCursos}</div>
-          <div className="label">Aprobados</div>
-        </div>
-        <div className="stat-card blue">
-          <div className="icon-row"><CalendarClock size={18} /> {enCursoCount}</div>
-          <div className="label">En curso</div>
-        </div>
-        <div className="stat-card muted">
-          <div className="icon-row"><BookX size={18} /> {noCursadoCount}</div>
-          <div className="label">No cursados</div>
+      {/* El heroe de la pantalla: una sola cifra grande en vez de cuatro
+          tarjetas del mismo peso, donde nada indicaba que mirar primero. */}
+      <section className="hero">
+        <AnilloProgreso porcentaje={progreso} />
+        <div className="hero-texto">
+          <h2>
+            {progreso === 0
+              ? 'Empecemos a marcar tu avance'
+              : progreso === 100
+                ? 'Terminaste la carrera'
+                : `Llevas ${progreso}% de tu carrera`}
+          </h2>
+          <p className="hero-sub">
+            {totalCursos > 0
+              ? `${aprobadosCount} de ${totalCursos} cursos aprobados`
+              : 'Elige tu carrera para ver tu avance'}
+          </p>
+          <dl className="hero-stats">
+            <div className="hero-stat green">
+              <dt><BookCheck size={15} /> Aprobados</dt>
+              <dd>{aprobadosCount}</dd>
+            </div>
+            <div className="hero-stat blue">
+              <dt><CalendarClock size={15} /> En curso</dt>
+              <dd>{enCursoCount}</dd>
+            </div>
+            <div className="hero-stat muted">
+              <dt><BookX size={15} /> Pendientes</dt>
+              <dd>{noCursadoCount}</dd>
+            </div>
+          </dl>
         </div>
       </section>
 
@@ -110,21 +128,23 @@ export default function Dashboard() {
       <section className="cards">
         {malla && (
           <div className="card disponibles">
-            <h3><Unlock size={16} /> Puedes llevar ahora</h3>
-            <p className="disponibles-sub">
-              Cursos con todos sus prerrequisitos aprobados.
-            </p>
+            <h3 className="card-titulo"><Unlock size={16} /> Puedes llevar ahora</h3>
+            <p className="card-sub">Cursos con todos sus prerrequisitos aprobados.</p>
             {disponibles.length > 0 ? (
-              <div className="list">
+              <div className="lista-filas">
                 {disponibles.map(({ curso, ciclo }) => (
-                  <div key={curso} className="list-item list-item-status">
-                    <span>{curso}</span>
-                    <span className="disponibles-ciclo">Ciclo {ciclo}</span>
-                  </div>
+                  <Link
+                    key={curso}
+                    to={`/curso/${encodeURIComponent(curso)}`}
+                    className="curso-fila enlace"
+                  >
+                    <span className="curso-enlace">{curso}</span>
+                    <span className="pastilla-ciclo">Ciclo {ciclo}</span>
+                  </Link>
                 ))}
               </div>
             ) : (
-              <p className="disponibles-vacio">
+              <p className="vacio">
                 No hay cursos habilitados: ya aprobaste o estas llevando todo lo que
                 tus prerrequisitos permiten.
               </p>
@@ -132,19 +152,21 @@ export default function Dashboard() {
 
             {sinDatos.length > 0 && (
               <details className="disponibles-sindatos">
-                <summary>
-                  Sin prerrequisitos registrados ({sinDatos.length})
-                </summary>
-                <p className="disponibles-nota">
+                <summary>Sin prerrequisitos registrados ({sinDatos.length})</summary>
+                <p className="card-sub">
                   No tenemos los prerrequisitos de estos cursos, asi que no podemos
                   confirmar si ya los puedes llevar.
                 </p>
-                <div className="list">
+                <div className="lista-filas">
                   {sinDatos.map(({ curso, ciclo }) => (
-                    <div key={curso} className="list-item list-item-status">
-                      <span>{curso}</span>
-                      <span className="disponibles-ciclo muted">Ciclo {ciclo}</span>
-                    </div>
+                    <Link
+                      key={curso}
+                      to={`/curso/${encodeURIComponent(curso)}`}
+                      className="curso-fila enlace"
+                    >
+                      <span className="curso-enlace">{curso}</span>
+                      <span className="pastilla-ciclo muted">Ciclo {ciclo}</span>
+                    </Link>
                   ))}
                 </div>
               </details>
@@ -155,35 +177,46 @@ export default function Dashboard() {
         {cursosGenerales ? (
           <>
             <div className="card courses">
-              <h3>Cursos Generales · Ciclo 1</h3>
-              <div className="course-grid">
-                {cursosGenerales[1].map((curso) => (
-                  <div key={curso} className="course-item course-item-status">
-                    <div className="course-title">{curso}</div>
-                    {selectorEstado(curso)}
-                  </div>
-                ))}
-              </div>
+              <h3 className="card-titulo">Cursos Generales · Ciclo 1</h3>
+              <div className="lista-filas">{cursosGenerales[1].map(filaCurso)}</div>
             </div>
 
             <div className="card completed">
-              <h3>Cursos Generales · Ciclo 2</h3>
-              <div className="list">
-                {cursosGenerales[2].map((curso) => (
-                  <div key={curso} className="list-item list-item-status">
-                    <span>{curso}</span>
-                    {selectorEstado(curso)}
-                  </div>
-                ))}
-              </div>
+              <h3 className="card-titulo">Cursos Generales · Ciclo 2</h3>
+              <div className="lista-filas">{cursosGenerales[2].map(filaCurso)}</div>
             </div>
           </>
         ) : (
           <div className="card courses">
-            <h3>Cursos Generales</h3>
-            <p>Selecciona tu carrera para ver los cursos generales que te corresponden.</p>
+            <h3 className="card-titulo">Cursos Generales</h3>
+            <p className="vacio">
+              Selecciona tu carrera para ver los cursos generales que te corresponden.
+            </p>
+            <Link to="/carrera" className="btn primary vacio-accion">
+              Elegir carrera <ChevronRight size={16} />
+            </Link>
           </div>
         )}
+      </section>
+
+      {/* Cambiar de carrera es una accion rara y destructiva (reencuadra todo el
+          avance), asi que baja al pie en vez de competir con las acciones
+          principales arriba. */}
+      <section className="pie-carrera">
+        <label className="pie-carrera-label" htmlFor="cambiar-carrera">
+          Estudias otra carrera?
+        </label>
+        <select
+          id="cambiar-carrera"
+          value={carrera}
+          onChange={(e) => cambiarCarrera(e.target.value)}
+          disabled={cambiandoCarrera}
+          className="select-suave"
+        >
+          {carreras.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
       </section>
     </Sidebar>
   );

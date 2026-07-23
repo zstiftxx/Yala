@@ -51,42 +51,93 @@ export default function MapaCurricular() {
     const grid = gridRef.current;
     if (!grid) return;
     const base = grid.getBoundingClientRect();
-    const puntoDerecho = (el) => {
+    // El hueco entre columnas es donde corre el tramo vertical de las flechas.
+    const hueco = parseFloat(getComputedStyle(grid).columnGap) || 36;
+
+    // getBoundingClientRect ya viene descontado el scroll, asi que se le suma
+    // de vuelta: las coordenadas del SVG son del contenido, no de lo visible.
+    const punto = (el, lado) => {
       const r = el.getBoundingClientRect();
-      return { x: r.right - base.left + grid.scrollLeft, y: r.top - base.top + grid.scrollTop + r.height / 2 };
-    };
-    const puntoIzquierdo = (el) => {
-      const r = el.getBoundingClientRect();
-      return { x: r.left - base.left + grid.scrollLeft, y: r.top - base.top + grid.scrollTop + r.height / 2 };
+      return {
+        x: (lado === 'der' ? r.right : r.left) - base.left + grid.scrollLeft,
+        y: r.top - base.top + grid.scrollTop + r.height / 2,
+      };
     };
 
     const nuevas = [];
     Object.entries(prereqs).forEach(([curso, lista]) => {
       const destino = cursoRefs.current[curso];
       if (!destino) return;
-      const d = puntoIzquierdo(destino);
+      const d = punto(destino, 'izq');
       lista.forEach((pre) => {
         const origen = cursoRefs.current[pre];
         if (!origen) return;
-        const o = puntoDerecho(origen);
+        const o = punto(origen, 'der');
         nuevas.push({ key: `${pre}->${curso}`, pre, dest: curso, x1: o.x, y1: o.y, x2: d.x, y2: d.y });
       });
     });
 
+    // Cada flecha baja por el hueco que hay justo ANTES de su columna destino.
+    // Si todas usaran el centro exacto del hueco, las que apuntan a la misma
+    // columna compartirian el tramo vertical y se veria una sola linea gorda;
+    // por eso se reparten en abanico dentro del hueco.
+    const porColumna = new Map();
+    nuevas.forEach((l) => {
+      const col = Math.round(l.x2);
+      if (!porColumna.has(col)) porColumna.set(col, []);
+      porColumna.get(col).push(l);
+    });
+    porColumna.forEach((grupo) => {
+      // Ordenar por altura del destino evita que los canales se crucen entre si.
+      grupo.sort((a, b) => a.y2 - b.y2);
+      const paso = Math.min(7, (hueco - 14) / Math.max(grupo.length - 1, 1));
+      grupo.forEach((l, i) => {
+        l.canal = l.x2 - hueco / 2 + (i - (grupo.length - 1) / 2) * paso;
+      });
+    });
+
     setLineas(nuevas);
-    setSize({ w: grid.scrollWidth, h: grid.scrollHeight });
+    setSize((previo) => {
+      const w = grid.scrollWidth;
+      const h = grid.scrollHeight;
+      // Sin esta comparacion el ResizeObserver se re-dispara con cada render.
+      return previo.w === w && previo.h === h ? previo : { w, h };
+    });
   }, [prereqs]);
 
   useLayoutEffect(() => {
     calcular();
-    const t = setTimeout(calcular, 300);
+    // Las tarjetas cambian de alto cuando termina de cargar la fuente y cuando
+    // el ancho del grid cambia; un setTimeout suelto se perdia esos casos.
+    const observador = new ResizeObserver(calcular);
+    if (gridRef.current) observador.observe(gridRef.current);
     window.addEventListener('resize', calcular);
-    return () => { clearTimeout(t); window.removeEventListener('resize', calcular); };
+    return () => { observador.disconnect(); window.removeEventListener('resize', calcular); };
   }, [calcular, carrera]);
 
-  const construirPath = ({ x1, y1, x2, y2 }) => {
-    const dx = Math.max(24, (x2 - x1) * 0.4);
-    return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+  // Rutas ortogonales con las esquinas redondeadas, no curvas en S: cuando hay
+  // cincuenta flechas, las bezier salen todas en angulos distintos y el mapa se
+  // lee como un plato de fideos. Asi cada flecha es "sale, baja por su canal,
+  // entra", y las que van a ciclos lejanos pasan por DEBAJO de las tarjetas
+  // (que son opacas), en vez de cruzarlas a la vista.
+  const construirPath = ({ x1, y1, x2, y2, canal }) => {
+    const n = (v) => Math.round(v * 10) / 10;
+    // Un prerrequisito siempre queda a la izquierda; si un dato malo lo pusiera
+    // al reves, la ruta ortogonal se calcularia con radios negativos.
+    if (x2 <= x1 + 12) return `M ${n(x1)} ${n(y1)} L ${n(x2)} ${n(y2)}`;
+    if (Math.abs(y1 - y2) < 2) return `M ${n(x1)} ${n(y1)} H ${n(x2)}`;
+
+    const xm = Math.min(Math.max(canal, x1 + 6), x2 - 6);
+    const dir = y2 > y1 ? 1 : -1;
+    const r = Math.min(9, Math.abs(y2 - y1) / 2, xm - x1, x2 - xm);
+    return [
+      `M ${n(x1)} ${n(y1)}`,
+      `H ${n(xm - r)}`,
+      `Q ${n(xm)} ${n(y1)} ${n(xm)} ${n(y1 + dir * r)}`,
+      `V ${n(y2 - dir * r)}`,
+      `Q ${n(xm)} ${n(y2)} ${n(xm + r)} ${n(y2)}`,
+      `H ${n(x2)}`,
+    ].join(' ');
   };
 
   const claseCurso = (curso) => {
@@ -103,20 +154,22 @@ export default function MapaCurricular() {
     if (relacionados) {
       return {
         stroke: enCamino ? 'var(--shell-accent)' : 'var(--shell-text-muted)',
-        opacity: enCamino ? 1 : 0.08,
+        opacity: enCamino ? 1 : 0.06,
         marker: enCamino ? 'flecha-accent' : 'flecha-gris',
       };
     }
+    // Sin nada seleccionado se ven todas a la vez, asi que van bajitas: son el
+    // fondo del mapa, no el contenido. Al elegir un curso, su camino sube a 1.
     return {
       stroke: aprobado ? 'var(--shell-green-text)' : 'var(--shell-text-muted)',
-      opacity: aprobado ? 0.9 : 0.4,
+      opacity: aprobado ? 0.55 : 0.22,
       marker: aprobado ? 'flecha-verde' : 'flecha-gris',
     };
   };
 
   return (
     <Sidebar active="dashboard" sinNav>
-      <header className="topbar">
+      <header className="page-head">
         <div className="malla-titulo">
           <Link to="/home" className="btn"><ArrowLeft size={16} /> Dashboard</Link>
           <div>
@@ -151,11 +204,17 @@ export default function MapaCurricular() {
             </div>
           )}
 
+          {/* El grid ya no comprime los ciclos hasta que quepan todos: cada
+              columna tiene un ancho minimo legible y el mapa se desliza en
+              horizontal. Con 10 ciclos en un telefono, "que entre todo" queria
+              decir columnas de 30px. */}
           <div
             className="malla-grid"
             ref={gridRef}
-            style={{ gridTemplateColumns: `repeat(${ciclos.length}, minmax(0, 1fr))` }}
+            style={{ gridTemplateColumns: `repeat(${ciclos.length}, minmax(132px, 1fr))` }}
             onClick={() => setSeleccionado(null)}
+            role="group"
+            aria-label={`Mapa curricular de ${carrera}, ${ciclos.length} ciclos`}
           >
             <svg className="malla-svg" width={size.w} height={size.h}>
               <defs>
@@ -178,7 +237,7 @@ export default function MapaCurricular() {
                     fill="none"
                     stroke={s.stroke}
                     strokeWidth="1.5"
-                    strokeDasharray="4 4"
+                    strokeLinejoin="round"
                     opacity={s.opacity}
                     markerEnd={`url(#${s.marker})`}
                   />
@@ -214,7 +273,10 @@ export default function MapaCurricular() {
             <span><i className="dot aprobado" /> Aprobado</span>
             <span><i className="dot en-curso" /> En curso</span>
             <span><i className="dot no-cursado" /> No cursado</span>
-            <span className="leyenda-flecha">— — → prerrequisito · haz clic en un curso para ver su camino</span>
+            <span className="leyenda-flecha">→ prerrequisito · toca un curso para ver su camino</span>
+            {/* Solo visible en movil: ahi el mapa nunca entra entero y sin
+                aviso no es obvio que se pueda arrastrar de lado. */}
+            <span className="leyenda-desliza">Desliza de lado para ver los demas ciclos</span>
           </div>
         </>
       ) : (

@@ -77,10 +77,12 @@ export default function FormularioMensaje({
 
   return (
     <Sidebar active={active}>
-      <header className="topbar">
-        <h1>{titulo}</h1>
+      <header className="page-head">
+        <div className="page-head-texto">
+          <h1>{titulo}</h1>
+          <p className="page-intro">{intro}</p>
+        </div>
       </header>
-      <p className="page-intro">{intro}</p>
 
       <section className="card form-estrecho">
         <form onSubmit={manejarEnviar} className="form-col">

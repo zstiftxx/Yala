@@ -81,10 +81,12 @@ export default function Notificaciones() {
 
   return (
     <Sidebar active="notificaciones">
-      <header className="topbar">
-        <h1>Notificaciones</h1>
+      <header className="page-head">
+        <div className="page-head-texto">
+          <h1>Notificaciones</h1>
+        </div>
         {sinLeer > 0 && (
-          <div className="top-actions">
+          <div className="page-head-acciones">
             <button className="btn" onClick={marcarTodas}>
               <CheckCheck size={16} /> Marcar todas como leidas
             </button>

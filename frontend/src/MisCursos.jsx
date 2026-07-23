@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import Sidebar from './Sidebar.jsx';
 import { useUser } from './useUser';
 import { obtenerMallaCompleta, carrerasConMallaCompleta } from './data/mallaCurricular';
-import { Search, ChevronRight, Info } from 'lucide-react';
+import EstadoCurso from './EstadoCurso.jsx';
+import { Search, Info } from 'lucide-react';
 
 const FILTROS = [
   { valor: 'todos', etiqueta: 'Todos' },
@@ -66,8 +67,10 @@ export default function MisCursos() {
   if (!malla) {
     return (
       <Sidebar active="mis-cursos">
-        <header className="topbar">
-          <h1>Mis Cursos</h1>
+        <header className="page-head">
+          <div className="page-head-texto">
+            <h1>Mis Cursos</h1>
+          </div>
         </header>
         <div className="card">
           <p className="vacio">
@@ -83,13 +86,15 @@ export default function MisCursos() {
 
   return (
     <Sidebar active="mis-cursos">
-      <header className="topbar">
-        <h1>Mis Cursos</h1>
+      <header className="page-head">
+        <div className="page-head-texto">
+          <h1>Mis Cursos</h1>
+          <p className="page-intro">
+            Todos los cursos de {carrera}. Busca uno para ver sus apuntes, resumenes y
+            examenes, o toca su estado para cambiarlo.
+          </p>
+        </div>
       </header>
-      <p className="page-intro">
-        Todos los cursos de {carrera}. Busca uno para ver sus apuntes, resumenes y
-        examenes, o cambia su estado desde aca.
-      </p>
 
       <div className="buscador">
         <Search size={16} className="buscador-icono" />
@@ -136,23 +141,23 @@ export default function MisCursos() {
       ) : (
         ciclos.map(({ ciclo, cursos }) => (
           <section className="card ciclo-bloque" key={ciclo}>
-            <h3>Ciclo {ciclo}</h3>
-            <div className="list">
+            <h3 className="card-titulo">
+              Ciclo {ciclo} <span className="card-conteo">{cursos.length}</span>
+            </h3>
+            <div className="lista-filas">
               {cursos.map((curso) => (
-                <div key={curso} className="list-item list-item-status">
+                <div key={curso} className="curso-fila">
+                  {/* Sin chevron: cuando el nombre envuelve a dos lineas la
+                      flecha queda suelta a media altura, y ademas competia con
+                      el boton de estado que ya vive a la derecha. */}
                   <Link to={`/curso/${encodeURIComponent(curso)}`} className="curso-enlace">
-                    {curso} <ChevronRight size={15} />
+                    {curso}
                   </Link>
-                  <select
-                    value={estadoCursos[curso] || 'no_cursado'}
-                    onChange={(e) => cambiarEstadoCurso(curso, e.target.value)}
-                    className="estado-curso-select"
-                    aria-label={`Estado de ${curso}`}
-                  >
-                    <option value="no_cursado">No cursado</option>
-                    <option value="en_curso">En curso</option>
-                    <option value="aprobado">Aprobado</option>
-                  </select>
+                  <EstadoCurso
+                    curso={curso}
+                    estado={estadoCursos[curso] || 'no_cursado'}
+                    onCambiar={(valor) => cambiarEstadoCurso(curso, valor)}
+                  />
                 </div>
               ))}
             </div>

@@ -11,6 +11,7 @@ import {
   borrarMaterial,
   normalizarUrl,
 } from './materiales';
+import EstadoCurso from './EstadoCurso.jsx';
 import { ArrowLeft, ExternalLink, Plus, Trash2, FileText, X } from 'lucide-react';
 
 const FILTROS = [{ valor: 'todos', etiqueta: 'Todos' }, ...TIPOS_MATERIAL];
@@ -48,37 +49,31 @@ export default function CursoDetalle() {
 
   return (
     <Sidebar active="mis-cursos">
-      <header className="topbar">
-        <div>
+      <header className="page-head">
+        <div className="page-head-texto">
           <Link to="/mis-cursos" className="volver">
             <ArrowLeft size={15} /> Mis Cursos
           </Link>
           <h1>{nombreCurso}</h1>
+          <div className="curso-chips">
+            {ciclo ? (
+              <span className="pastilla-ciclo">Ciclo {ciclo}</span>
+            ) : (
+              <span className="pastilla-ciclo muted">Fuera de tu malla</span>
+            )}
+            {prerequisitos.length > 0 && (
+              <span className="curso-prereqs">Requiere: {prerequisitos.join(', ')}</span>
+            )}
+          </div>
         </div>
-        <div className="top-actions">
-          <select
-            value={estado}
-            onChange={(e) => cambiarEstadoCurso(nombreCurso, e.target.value)}
-            className="estado-curso-select"
-            aria-label="Estado del curso"
-          >
-            <option value="no_cursado">No cursado</option>
-            <option value="en_curso">En curso</option>
-            <option value="aprobado">Aprobado</option>
-          </select>
+        <div className="page-head-acciones">
+          <EstadoCurso
+            curso={nombreCurso}
+            estado={estado}
+            onCambiar={(valor) => cambiarEstadoCurso(nombreCurso, valor)}
+          />
         </div>
       </header>
-
-      <div className="curso-chips">
-        {ciclo ? (
-          <span className="disponibles-ciclo">Ciclo {ciclo}</span>
-        ) : (
-          <span className="disponibles-ciclo muted">Fuera de tu malla</span>
-        )}
-        {prerequisitos.length > 0 && (
-          <span className="curso-prereqs">Requiere: {prerequisitos.join(', ')}</span>
-        )}
-      </div>
 
       {/* `key` remonta la lista al pasar de un curso a otro: sin eso quedarian
           visibles los materiales del curso anterior mientras carga el nuevo. */}
@@ -142,18 +137,20 @@ function Materiales({ curso }) {
   return (
     <section className="card">
       <div className="materiales-head">
-        <h3>
-          <FileText size={16} /> Materiales
-        </h3>
+        <div>
+          <h3 className="card-titulo">
+            <FileText size={16} /> Materiales
+          </h3>
+          <p className="card-sub">
+            Apuntes, resumenes y examenes que comparten los estudiantes. Todo es un enlace
+            (Drive, Notion, lo que uses).
+          </p>
+        </div>
         <button className="btn primary" onClick={() => setAbierto((v) => !v)}>
           {abierto ? <X size={16} /> : <Plus size={16} />}
           {abierto ? 'Cancelar' : 'Agregar material'}
         </button>
       </div>
-      <p className="page-intro">
-        Apuntes, resumenes y examenes que comparten los estudiantes. Todo es un enlace (Drive,
-        Notion, lo que uses).
-      </p>
 
       {abierto && (
         <FormularioMaterial
