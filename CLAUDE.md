@@ -105,13 +105,14 @@ Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los
 - **`src/materiales.js`** es la única capa que toca la tabla `materiales`: listar, crear, borrar, y traducir errores de Postgres (incluye el `42P01` de tabla inexistente). Las páginas no llaman a `supabase.from('materiales')` por su cuenta.
 - `normalizarUrl` solo acepta `http(s)`. La URL termina en un `href`, así que un `javascript:` pegado por otro usuario sería un XSS de un clic. No relajar eso.
 - La lista vive en un componente hijo con `key={curso}` para que se remonte al saltar de un curso a otro.
-- **Moderación**: `aprobado` arranca en `false` y se aprueba a mano desde el Table editor de Supabase. El autor ve lo suyo marcado como "Pendiente de revisión"; el resto solo ve lo aprobado.
+- **Moderación reactiva, no previa** (decidido 2026-07-23): el material se publica al instante (`crearMaterial` inserta `aprobado: true`) y se **baja** poniendo `aprobado = false` desde el Table editor cuando llega un reporte por `/reportar`.
+  - Antes `aprobado` arrancaba en `false` y **nada en la app lo ponía en `true`**: con la policy de select (`aprobado or auth.uid() = user_id`), cada quien veía solo sus propios materiales y no se compartía nada con nadie. La función central de la app no funcionaba. Si quedaron filas viejas en `false`, hay que subirlas a mano.
+  - La policy de update deja que el autor toque `aprobado` en lo suyo, y es intencional. Para pasar a aprobación previa haría falta `revoke update (aprobado) ... from authenticated`, porque RLS filtra filas y no columnas.
 - Se llega a un curso desde `/mis-cursos` (catálogo con buscador) o desde el panel del mapa curricular.
 
 ## Pendientes / ideas futuras
 - **Probar el flujo real con sesión** ahora que las tablas existen: enviar un feedback, un reporte, y subir/borrar un material desde `/curso/:curso`.
 - Decidir el nombre de la app.
 - Mallas actualizadas de las 5 carreras pendientes.
-- Decidir la moderación de `materiales`: hoy la policy de update deja que el autor ponga `aprobado = true` en lo suyo, o sea que puede autoaprobarse. Está anotado en `supabase/materiales.sql`.
 - **Verificar en el navegador las pantallas con sesión** (Mis Cursos, detalle de curso, Perfil, onboarding): el preview no puede pasar el login. El rediseño se verificó inyectando el markup equivalente en el DOM, lo que valida el CSS pero **no** que cada componente lo produzca igual. El mapa curricular no se revisó en pantalla.
 - Opcional: agregar códigos/créditos reales a las tarjetas.

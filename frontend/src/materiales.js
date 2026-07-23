@@ -69,6 +69,13 @@ export async function crearMaterial({ usuario, carrera, curso, tipo, titulo, url
       titulo: titulo.trim(),
       url,
       ciclo: ciclo?.trim() || null,
+      // Se publica de una. La columna arranca en false por el default de la
+      // tabla, y NADA en la app la ponia en true: con la policy de select
+      // (`aprobado or auth.uid() = user_id`) cada quien veia solo lo suyo y
+      // los apuntes no llegaban a nadie mas, que es el punto de la app.
+      // `aprobado` se conserva como interruptor para BAJAR algo desde el Table
+      // editor si llega un reporte por /reportar.
+      aprobado: true,
     })
     .select()
     .single();

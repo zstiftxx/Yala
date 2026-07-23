@@ -557,7 +557,6 @@ textarea.form-input { resize: vertical; }
   display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
   margin-top: var(--sp-2); font-size: var(--fs-xs); color: var(--shell-text-muted);
 }
-.material-meta .pendiente { color: var(--shell-accent-fuerte); font-weight: 600; }
 
 /* ---------- Notificaciones ---------- */
 .notif-lista { max-width: 660px; }

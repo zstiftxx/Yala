@@ -204,7 +204,6 @@ function Materiales({ curso }) {
                   {m.ciclo && <span>{m.ciclo}</span>}
                   <span>{dominio(m.url)}</span>
                   <span>{fechaCorta(m.created_at)}</span>
-                  {!m.aprobado && <span className="pendiente">Pendiente de revision</span>}
                 </div>
               </div>
               {m.user_id === user?.id && (

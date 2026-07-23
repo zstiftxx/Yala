@@ -20,7 +20,7 @@ create table if not exists public.materiales (
   titulo     text not null,
   url        text not null,
   ciclo      text,                    -- ciclo/periodo del material (ej: "2025-1")
-  aprobado   boolean not null default false,  -- moderacion: ver policies
+  aprobado   boolean not null default true,   -- moderacion: ver policies
   created_at timestamptz not null default now()
 );
 
@@ -34,17 +34,19 @@ create policy "materiales_insert_propio"
   on public.materiales for insert
   with check (auth.uid() = user_id);
 
--- Lectura: lo ya moderado lo ve cualquier autenticado (ese es el punto de la
--- app), y ademas cada quien ve lo suyo aunque siga pendiente de aprobar.
+-- Lectura: lo publicado lo ve cualquier autenticado (ese es el punto de la
+-- app), y ademas cada quien ve lo suyo aunque se lo hayan bajado.
 create policy "materiales_select_aprobado_o_propio"
   on public.materiales for select
   using (aprobado or auth.uid() = user_id);
 
 -- Solo el autor puede corregir o borrar lo suyo. Nadie mas.
--- OJO: esto deja que el autor ponga aprobado = true en su propio material.
--- Mientras la moderacion sea manual desde el Table editor, quitar la columna
--- de este update (o mover la aprobacion a una funcion con security definer)
--- si se quiere que aprobar sea exclusivamente tuyo.
+-- El autor tambien puede tocar `aprobado` en lo suyo, y esta bien: la
+-- moderacion es REACTIVA (se publica de una y se baja si llega un reporte),
+-- no previa. Si algun dia se quiere aprobacion previa, hay que sacar la
+-- columna de este update con:
+--   revoke update (aprobado) on public.materiales from authenticated;
+-- (RLS filtra filas, no columnas: la policy sola no alcanza para eso.)
 create policy "materiales_update_propio"
   on public.materiales for update
   using (auth.uid() = user_id)
