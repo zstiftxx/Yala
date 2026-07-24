@@ -85,6 +85,8 @@ Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los
 - **`cursosGenerales.js`** — ciclos 1-2 (generales) de las 14 carreras. **Fuente de verdad de los generales**: aunque un PDF viejo difiera, se conservan estos.
 - **`mallaCurricular.js`** — fusiona generales (1-2) + `cursosAvanzados` (ciclo 3+) + `prerequisitos`. Ing. de Sistemas está escrito a mano; el resto se importa de `mallasGeneradas.js`.
 - **`mallasGeneradas.js`** — generado automáticamente desde los PDF oficiales (con pdfplumber). Solo ciclos 3+, sin electivos, traducciones al inglés recortadas.
+  - **Ni los PDF ni el script de extracción están en el repo** (verificado 2026-07-23: no hay ningún `.pdf` ni `.py`). O sea que las 8 mallas generadas **no son reproducibles**: si la ULima actualiza un plan, hay que rehacer el trabajo desde cero, y no queda registro de qué PDF salió cada dato. Si aparecen los PDF, conviene versionarlos junto al script.
+  - Las 5 carreras pendientes **no tienen datos en este archivo**, ni siquiera parciales: se descartaron al generar. No hay nada que corregir ahí; hace falta la fuente.
 
 ### Estado de las mallas
 - **Completas (9)**: Ing. de Sistemas + Administración, Arquitectura, Contabilidad y Finanzas, Economía, Ing. Civil, Ing. Mecatrónica, Negocios Internacionales, Psicología.
