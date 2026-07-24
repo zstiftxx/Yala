@@ -1,6 +1,9 @@
 // Generado desde los planes de estudio (PDF) de la Universidad de Lima.
 // Ciclos 3+ por carrera; los ciclos 1-2 se toman de cursosGenerales.js.
 // Solo cursos obligatorios (sin electivos).
+//
+// NO EDITAR A MANO: regenerar con `python scripts/extraer_mallas.py`.
+// Los PDF de origen estan en scripts/pdf/.
 
 export const cursosAvanzadosGenerados = {
   "Administración": {
@@ -109,6 +112,47 @@ export const cursosAvanzadosGenerados = {
       "Seminario de Investigación en Arquitectura"
     ]
   },
+  "Comunicaciones": {
+    "3": [
+      "Storytelling",
+      "Gamificación",
+      "Fundamentos de la Comunicación",
+      "Estéticas Contemporáneas",
+      "Lenguaje Gráfico",
+      "Lenguaje Audiovisual",
+      "Fundamentos de Publicidad y Marketing"
+    ],
+    "4": [
+      "Bases de la Información",
+      "Comunicación y Desarrollo",
+      "Técnicas Fotográficas",
+      "Comunicación y Empresa",
+      "Técnicas Audiovisuales"
+    ],
+    "5": [
+      "Sociedad y Comunicación",
+      "Narrativa Audiovisual",
+      "Técnicas de Audio",
+      "Técnicas de Diseño"
+    ],
+    "6": [
+      "Técnicas de Investigación",
+      "Taller de Video*",
+      "Comunicación y Experiencia de Usuario"
+    ],
+    "7": [
+      "Procesos Interculturales",
+      "Comunicación Política",
+      "Educación y Comunicación",
+      "Semiótica Narrativa"
+    ],
+    "8": [
+      "Gestión Empresarial"
+    ],
+    "9": [
+      "Legislación y Ética Profesional"
+    ]
+  },
   "Contabilidad y Finanzas": {
     "3": [
       "Fundamentos de Administración",
@@ -160,6 +204,79 @@ export const cursosAvanzadosGenerados = {
       "Tributación Sectorial",
       "ERP para la Gestión Empresarial",
       "Auditoría Forense"
+    ]
+  },
+  "Derecho": {
+    "3": [
+      "Expresión Escrita",
+      "Problemática Nacional",
+      "Historia General del Derecho",
+      "Introducción a la Ciencia Política",
+      "Introducción a las Ciencias Jurídicas",
+      "Derecho Civil I (Principios Generales y Personas Naturales)"
+    ],
+    "4": [
+      "Derecho Civil II (Personas Jurídicas)",
+      "Introducción al Derecho Procesal",
+      "Derecho Romano",
+      "Derecho Penal I (Parte General)",
+      "Derecho Constitucional I (Derecho Constitucional General)",
+      "Lógica y Argumentación Jurídica"
+    ],
+    "5": [
+      "Derecho Penal II",
+      "Derecho Civil III (Acto Jurídico)",
+      "Derecho Constitucional II (Derecho Constitucional Peruano)",
+      "Filosofía del Derecho",
+      "Derecho Procesal Civil I",
+      "Introducción a la Economía y Derecho"
+    ],
+    "6": [
+      "Derecho Administrativo I",
+      "Derecho Procesal Penal I",
+      "Derecho Procesal Constitucional",
+      "Derecho Civil IV (Reales)",
+      "Derecho Procesal Civil II",
+      "Introducción a la Contabilidad"
+    ],
+    "7": [
+      "Derecho Civil V (Familia)",
+      "Derecho Administrativo II",
+      "Derecho Comercial I (Parte General)",
+      "Derecho Procesal Penal II",
+      "Derecho Civil VI (Obligaciones)",
+      "Derecho Procesal Civil III"
+    ],
+    "8": [
+      "Derecho Civil VIII (Sucesiones)",
+      "Derecho Laboral I (Parte General)",
+      "Derecho Comercial II (Sociedades I)",
+      "Derecho Civil VII (Contratos Parte General)",
+      "Derecho Tributario I (Código Tributario)"
+    ],
+    "9": [
+      "Derecho Tributario II",
+      "Derecho Civil IX (Contratos Típicos)",
+      "Derecho Penal III (Penal Económico)",
+      "Derecho Comercial III (Sociedades II)",
+      "Derecho Laboral II (Derecho Laboral Individual)"
+    ],
+    "10": [
+      "Derecho Civil X (Garantías)",
+      "Seminario de Investigación I",
+      "Derecho Internacional Público",
+      "Arbitraje",
+      "Derecho Comercial IV (Títulos Valores)"
+    ],
+    "11": [
+      "Ética Profesional",
+      "Derecho Registral y Notarial",
+      "Derecho Civil XI (Responsabilidad Civil)"
+    ],
+    "12": [
+      "Introducción a las Técnicas de Litigación Oral",
+      "Seminario de Investigación II",
+      "Derecho Internacional Privado"
     ]
   },
   "Economía": {
@@ -222,6 +339,65 @@ export const cursosAvanzadosGenerados = {
       "Tópicos en Investigación Económica"
     ]
   },
+  "Ingeniería Ambiental": {
+    "3": [
+      "Inteligencia Artificial Aplicada",
+      "Sistemas de Información Geográfica",
+      "Fundamentos de Programación",
+      "Física I",
+      "Química General",
+      "Cálculo II"
+    ],
+    "4": [
+      "Principios de Ingeniería Sostenible",
+      "Estadística y Probabilidad",
+      "Biología Ambiental",
+      "Física II",
+      "Química Ambiental",
+      "Cálculo III"
+    ],
+    "5": [
+      "Estadística Aplicada",
+      "Derecho y Legislación Ambiental",
+      "Cambio Climático",
+      "Termodinámica",
+      "Ciencia del Suelo",
+      "Técnicas Instrumentales de Análisis"
+    ],
+    "6": [
+      "Gestión Sostenible de Residuos",
+      "Costeo de Proyectos Ambientales",
+      "Técnicas de Control de Contaminación del Aire",
+      "Energías Renovables",
+      "Mecánica de Fluidos",
+      "Microbiología Ambiental"
+    ],
+    "7": [
+      "Medio Ambiente y Sociedad",
+      "Recursos Naturales y Ecosistemas",
+      "Técnicas de Control de la Contaminación del Agua",
+      "Ética y Responsabilidad Social",
+      "Sistemas Integrados de Gestión",
+      "Economía Ambiental"
+    ],
+    "8": [
+      "Evaluación del Impacto Ambiental",
+      "Hidrología",
+      "Técnicas de Control de la Contaminación del Suelo",
+      "Inteligencia de Negocios",
+      "Gestión de Recursos Energéticos"
+    ],
+    "9": [
+      "Ecotoxicología Ambiental",
+      "Proyecto de Ingeniería Aplicada I",
+      "Formulación y Diseño de Proyectos Sostenibles"
+    ],
+    "10": [
+      "Proyecto de Ingeniería Aplicada II",
+      "Restauración y Compensación Ambiental",
+      "Gestión de Proyectos"
+    ]
+  },
   "Ingeniería Civil": {
     "3": [
       "Cálculo II",
@@ -281,6 +457,64 @@ export const cursosAvanzadosGenerados = {
       "Estructuras Metálicas"
     ]
   },
+  "Ingeniería Industrial": {
+    "3": [
+      "Sistemas Organizacionales",
+      "Diseño Asistido por el Computador",
+      "Inteligencia Artificial Aplicada",
+      "Física I",
+      "Química General",
+      "Cálculo II"
+    ],
+    "4": [
+      "Costeo de Operaciones",
+      "Fundamentos de Programación",
+      "Física II",
+      "Estadística y Probabilidad",
+      "Mecánica",
+      "Cálculo III"
+    ],
+    "5": [
+      "Investigación de Operaciones I",
+      "Fundamentos de Operaciones y Logística",
+      "Ingeniería Económica",
+      "Electricidad y Electrónica",
+      "Ecuaciones Diferenciales",
+      "Diseño de Experimentos"
+    ],
+    "6": [
+      "Investigación de Operaciones II",
+      "Ergonomía y Diseño del Trabajo",
+      "Innovación en Ingeniería",
+      "Planeamiento y Control de Operaciones",
+      "Procesos Industriales"
+    ],
+    "7": [
+      "Ingeniería Financiera",
+      "Diseño de Instalaciones",
+      "Inteligencia de Negocios",
+      "Modelos de Sistemas Logísticos",
+      "Calidad",
+      "Procesos de Manufactura"
+    ],
+    "8": [
+      "Simulación de Procesos",
+      "Modelamiento Predictivo de Datos",
+      "Sistemas Integrados de Gestión",
+      "Gestión de Proyectos",
+      "Análisis de Problemas de Ingeniería",
+      "Automatización Industrial"
+    ],
+    "9": [
+      "Ética y Gestión Humana",
+      "Proyecto de Ingeniería Aplicada I",
+      "Ingeniería Comercial"
+    ],
+    "10": [
+      "Proyecto de Ingeniería Aplicada II",
+      "Gerencia Estratégica"
+    ]
+  },
   "Ingeniería Mecatrónica": {
     "3": [
       "Inteligencia Artificial Aplicada",
@@ -336,6 +570,70 @@ export const cursosAvanzadosGenerados = {
     "10": [
       "Sistemas Robóticos Industriales",
       "Proyecto Integrador de Mecatrónica II"
+    ]
+  },
+  "Marketing": {
+    "3": [
+      "Estadística Empresarial I",
+      "Contabilidad General",
+      "Antropología del Consumidor",
+      "Introducción a las Finanzas",
+      "Matemática para la Gestión de Negocios",
+      "Herramientas Informáticas para la Gestión I"
+    ],
+    "4": [
+      "Costos y Presupuestos",
+      "Sociología del Consumidor",
+      "Procesos de Marketing",
+      "Estadística Empresarial II",
+      "Administración Empresarial y Marketing",
+      "Microeconomía"
+    ],
+    "5": [
+      "Estadística Aplicada al Marketing",
+      "Consumidor y Experiencia del Cliente",
+      "Elaboración de Estados Financieros",
+      "Administración de Canales de Distribución",
+      "Gestión de Producto y Marca",
+      "Macroeconomía"
+    ],
+    "6": [
+      "Política y Fijación de Precios",
+      "Operaciones Logísticas de Marketing",
+      "Investigación Cuantitativa de Mercados",
+      "Publicidad y Medios",
+      "Branding",
+      "Investigación Cualitativa de Mercados",
+      "Ciencia de Datos Aplicado al Marketing"
+    ],
+    "7": [
+      "Dirección Estratégica de Marketing",
+      "Finanzas para Marketing",
+      "Marketing Social",
+      "Comunicación e Imagen Corporativa",
+      "Transformación Digital y Marketing",
+      "Endomarketing y Gestión de Personas"
+    ],
+    "8": [
+      "Gerencia de Ventas",
+      "Ética y Sostenibilidad Empresarial",
+      "Herramientas Estratégicas de Negocios y Marketing",
+      "Métodos y Técnicas de Evaluación de Proyectos",
+      "E-commerce"
+    ],
+    "9": [
+      "Trade Marketing y Merchandising",
+      "Marketing de Servicios",
+      "Seminario de Investigación en Marketing I",
+      "Analítica de Datos",
+      "Negociación Comercial"
+    ],
+    "10": [
+      "Seminario de Investigación en Marketing II",
+      "Estrategias de Marketing Internacional",
+      "Estrategia de Relacionamiento y Fidelización",
+      "Plan de Marketing",
+      "Planeamiento Estratégico Publicitario"
     ]
   },
   "Negocios Internacionales": {
@@ -666,6 +964,63 @@ export const prerequisitosGenerados = {
       "Historia de la Arquitectura Peruana"
     ]
   },
+  "Comunicaciones": {
+    "Storytelling": [
+      "Lenguaje y Comunicación II"
+    ],
+    "Bases de la Información": [
+      "Storytelling"
+    ],
+    "Comunicación y Desarrollo": [
+      "Fundamentos de la Comunicación"
+    ],
+    "Técnicas Fotográficas": [
+      "Lenguaje Gráfico"
+    ],
+    "Comunicación y Empresa": [
+      "Fundamentos de la Comunicación"
+    ],
+    "Sociedad y Comunicación": [
+      "Fundamentos de la Comunicación"
+    ],
+    "Narrativa Audiovisual": [
+      "Storytelling"
+    ],
+    "Técnicas de Audio": [
+      "Técnicas Audiovisuales"
+    ],
+    "Técnicas de Diseño": [
+      "Lenguaje Gráfico"
+    ],
+    "Técnicas de Investigación": [
+      "Sociedad y Comunicación"
+    ],
+    "Taller de Video*": [
+      "Técnicas Audiovisuales",
+      "Narrativa Audiovisual"
+    ],
+    "Comunicación y Experiencia de Usuario": [
+      "Técnicas de Diseño"
+    ],
+    "Procesos Interculturales": [
+      "Sociedad y Comunicación"
+    ],
+    "Comunicación Política": [
+      "Sociedad y Comunicación"
+    ],
+    "Educación y Comunicación": [
+      "Sociedad y Comunicación"
+    ],
+    "Semiótica Narrativa": [
+      "Narrativa Audiovisual"
+    ],
+    "Gestión Empresarial": [
+      "Técnicas de Investigación"
+    ],
+    "Legislación y Ética Profesional": [
+      "Comunicación Política"
+    ]
+  },
   "Contabilidad y Finanzas": {
     "Fundamentos de Administración": [
       "Economía y Empresa"
@@ -783,6 +1138,159 @@ export const prerequisitosGenerados = {
     ],
     "Auditoría Forense": [
       "Auditoría Financiera I"
+    ]
+  },
+  "Derecho": {
+    "Expresión Escrita": [
+      "Lenguaje y Comunicación II"
+    ],
+    "Problemática Nacional": [
+      "Economía y Empresa"
+    ],
+    "Derecho Civil II (Personas Jurídicas)": [
+      "Derecho Civil I (Principios Generales y Personas Naturales)"
+    ],
+    "Introducción al Derecho Procesal": [
+      "Introducción a las Ciencias Jurídicas"
+    ],
+    "Derecho Romano": [
+      "Historia General del Derecho"
+    ],
+    "Derecho Penal I (Parte General)": [
+      "Introducción a las Ciencias Jurídicas"
+    ],
+    "Derecho Constitucional I (Derecho Constitucional General)": [
+      "Introducción a la Ciencia Política"
+    ],
+    "Lógica y Argumentación Jurídica": [
+      "Introducción a las Ciencias Jurídicas"
+    ],
+    "Derecho Penal II": [
+      "Derecho Penal I (Parte General)"
+    ],
+    "Derecho Civil III (Acto Jurídico)": [
+      "Derecho Civil II (Personas Jurídicas)"
+    ],
+    "Derecho Constitucional II (Derecho Constitucional Peruano)": [
+      "Derecho Constitucional I (Derecho Constitucional General)"
+    ],
+    "Filosofía del Derecho": [
+      "Filosofía Aplicada",
+      "Introducción a las Ciencias Jurídicas"
+    ],
+    "Derecho Procesal Civil I": [
+      "Introducción al Derecho Procesal"
+    ],
+    "Introducción a la Economía y Derecho": [
+      "Economía y Empresa",
+      "Introducción a las Ciencias Jurídicas"
+    ],
+    "Derecho Administrativo I": [
+      "Derecho Constitucional II (Derecho Constitucional Peruano)"
+    ],
+    "Derecho Procesal Penal I": [
+      "Introducción al Derecho Procesal",
+      "Derecho Penal II"
+    ],
+    "Derecho Procesal Constitucional": [
+      "Derecho Constitucional II (Derecho Constitucional Peruano)",
+      "Derecho Procesal Civil I"
+    ],
+    "Derecho Civil IV (Reales)": [
+      "Derecho Civil III (Acto Jurídico)"
+    ],
+    "Derecho Procesal Civil II": [
+      "Derecho Procesal Civil I"
+    ],
+    "Derecho Civil V (Familia)": [
+      "Derecho Civil IV (Reales)"
+    ],
+    "Derecho Administrativo II": [
+      "Derecho Administrativo I"
+    ],
+    "Derecho Comercial I (Parte General)": [
+      "Derecho Civil IV (Reales)"
+    ],
+    "Derecho Procesal Penal II": [
+      "Derecho Procesal Penal I"
+    ],
+    "Derecho Civil VI (Obligaciones)": [
+      "Derecho Civil IV (Reales)"
+    ],
+    "Derecho Procesal Civil III": [
+      "Derecho Procesal Civil II"
+    ],
+    "Derecho Civil VIII (Sucesiones)": [
+      "Derecho Civil VI (Obligaciones)",
+      "Derecho Civil V (Familia)"
+    ],
+    "Derecho Laboral I (Parte General)": [
+      "Derecho Administrativo II",
+      "Derecho Civil VI (Obligaciones)"
+    ],
+    "Derecho Comercial II (Sociedades I)": [
+      "Derecho Comercial I (Parte General)"
+    ],
+    "Derecho Civil VII (Contratos Parte General)": [
+      "Derecho Civil VI (Obligaciones)"
+    ],
+    "Derecho Tributario I (Código Tributario)": [
+      "Derecho Administrativo II"
+    ],
+    "Derecho Tributario II": [
+      "Derecho Tributario I (Código Tributario)"
+    ],
+    "Derecho Civil IX (Contratos Típicos)": [
+      "Derecho Civil VII (Contratos Parte General)"
+    ],
+    "Derecho Penal III (Penal Económico)": [
+      "Derecho Penal II",
+      "Derecho Tributario I (Código Tributario)",
+      "Derecho Comercial II (Sociedades I)"
+    ],
+    "Derecho Comercial III (Sociedades II)": [
+      "Derecho Comercial II (Sociedades I)"
+    ],
+    "Derecho Laboral II (Derecho Laboral Individual)": [
+      "Derecho Laboral I (Parte General)"
+    ],
+    "Derecho Civil X (Garantías)": [
+      "Derecho Civil VII (Contratos Parte General)"
+    ],
+    "Seminario de Investigación I": [
+      "Derecho Tributario I (Código Tributario)",
+      "Derecho Comercial II (Sociedades I)",
+      "Derecho Civil IX (Contratos Típicos)"
+    ],
+    "Derecho Internacional Público": [
+      "Derecho Constitucional II (Derecho Constitucional Peruano)"
+    ],
+    "Arbitraje": [
+      "Derecho Comercial II (Sociedades I)",
+      "Derecho Procesal Civil III"
+    ],
+    "Derecho Comercial IV (Títulos Valores)": [
+      "Derecho Comercial II (Sociedades I)",
+      "Derecho Civil VII (Contratos Parte General)"
+    ],
+    "Ética Profesional": [
+      "Filosofía del Derecho"
+    ],
+    "Derecho Registral y Notarial": [
+      "Derecho Comercial II (Sociedades I)",
+      "Derecho Civil IX (Contratos Típicos)"
+    ],
+    "Derecho Civil XI (Responsabilidad Civil)": [
+      "Derecho Civil IX (Contratos Típicos)"
+    ],
+    "Introducción a las Técnicas de Litigación Oral": [
+      "Derecho Procesal Civil III"
+    ],
+    "Seminario de Investigación II": [
+      "Seminario de Investigación I"
+    ],
+    "Derecho Internacional Privado": [
+      "Derecho Civil X (Garantías)"
     ]
   },
   "Economía": {
@@ -913,6 +1421,80 @@ export const prerequisitosGenerados = {
       "Política Económica"
     ]
   },
+  "Ingeniería Ambiental": {
+    "Física I": [
+      "Cálculo I"
+    ],
+    "Cálculo II": [
+      "Cálculo I"
+    ],
+    "Principios de Ingeniería Sostenible": [
+      "Fundamentos de Programación"
+    ],
+    "Estadística y Probabilidad": [
+      "Cálculo II"
+    ],
+    "Física II": [
+      "Física I"
+    ],
+    "Química Ambiental": [
+      "Química General"
+    ],
+    "Cálculo III": [
+      "Cálculo II"
+    ],
+    "Estadística Aplicada": [
+      "Estadística y Probabilidad"
+    ],
+    "Derecho y Legislación Ambiental": [
+      "Principios de Ingeniería Sostenible"
+    ],
+    "Ciencia del Suelo": [
+      "Química Ambiental"
+    ],
+    "Técnicas Instrumentales de Análisis": [
+      "Química Ambiental"
+    ],
+    "Gestión Sostenible de Residuos": [
+      "Derecho y Legislación Ambiental"
+    ],
+    "Técnicas de Control de Contaminación del Aire": [
+      "Estadística Aplicada"
+    ],
+    "Energías Renovables": [
+      "Física II"
+    ],
+    "Mecánica de Fluidos": [
+      "Física II"
+    ],
+    "Microbiología Ambiental": [
+      "Biología Ambiental"
+    ],
+    "Técnicas de Control de la Contaminación del Agua": [
+      "Mecánica de Fluidos"
+    ],
+    "Sistemas Integrados de Gestión": [
+      "Derecho y Legislación Ambiental"
+    ],
+    "Economía Ambiental": [
+      "Costeo de Proyectos Ambientales"
+    ],
+    "Evaluación del Impacto Ambiental": [
+      "Recursos Naturales y Ecosistemas"
+    ],
+    "Técnicas de Control de la Contaminación del Suelo": [
+      "Recursos Naturales y Ecosistemas"
+    ],
+    "Proyecto de Ingeniería Aplicada I": [
+      "Inteligencia de Negocios"
+    ],
+    "Formulación y Diseño de Proyectos Sostenibles": [
+      "Evaluación del Impacto Ambiental"
+    ],
+    "Proyecto de Ingeniería Aplicada II": [
+      "Proyecto de Ingeniería Aplicada I"
+    ]
+  },
   "Ingeniería Civil": {
     "Cálculo II": [
       "Cálculo I"
@@ -1017,6 +1599,116 @@ export const prerequisitosGenerados = {
       "Análisis Estructural I"
     ]
   },
+  "Ingeniería Industrial": {
+    "Diseño Asistido por el Computador": [
+      "Álgebra Lineal"
+    ],
+    "Física I": [
+      "Cálculo I"
+    ],
+    "Cálculo II": [
+      "Cálculo I"
+    ],
+    "Costeo de Operaciones": [
+      "Sistemas Organizacionales"
+    ],
+    "Fundamentos de Programación": [
+      "Inteligencia Artificial Aplicada"
+    ],
+    "Física II": [
+      "Física I"
+    ],
+    "Estadística y Probabilidad": [
+      "Cálculo I"
+    ],
+    "Mecánica": [
+      "Física I",
+      "Diseño Asistido por el Computador"
+    ],
+    "Cálculo III": [
+      "Cálculo II"
+    ],
+    "Investigación de Operaciones I": [
+      "Fundamentos de Programación"
+    ],
+    "Fundamentos de Operaciones y Logística": [
+      "Costeo de Operaciones"
+    ],
+    "Ingeniería Económica": [
+      "Costeo de Operaciones"
+    ],
+    "Electricidad y Electrónica": [
+      "Física II"
+    ],
+    "Ecuaciones Diferenciales": [
+      "Cálculo III"
+    ],
+    "Diseño de Experimentos": [
+      "Estadística y Probabilidad"
+    ],
+    "Investigación de Operaciones II": [
+      "Investigación de Operaciones I"
+    ],
+    "Ergonomía y Diseño del Trabajo": [
+      "Estadística y Probabilidad"
+    ],
+    "Innovación en Ingeniería": [
+      "Electricidad y Electrónica",
+      "Mecánica"
+    ],
+    "Planeamiento y Control de Operaciones": [
+      "Fundamentos de Operaciones y Logística"
+    ],
+    "Procesos Industriales": [
+      "Química General",
+      "Física II"
+    ],
+    "Ingeniería Financiera": [
+      "Ingeniería Económica"
+    ],
+    "Diseño de Instalaciones": [
+      "Ergonomía y Diseño del Trabajo"
+    ],
+    "Modelos de Sistemas Logísticos": [
+      "Fundamentos de Operaciones y Logística"
+    ],
+    "Calidad": [
+      "Diseño de Experimentos"
+    ],
+    "Procesos de Manufactura": [
+      "Innovación en Ingeniería"
+    ],
+    "Simulación de Procesos": [
+      "Investigación de Operaciones II"
+    ],
+    "Modelamiento Predictivo de Datos": [
+      "Inteligencia de Negocios"
+    ],
+    "Sistemas Integrados de Gestión": [
+      "Calidad"
+    ],
+    "Análisis de Problemas de Ingeniería": [
+      "Modelos de Sistemas Logísticos",
+      "Calidad"
+    ],
+    "Automatización Industrial": [
+      "Procesos de Manufactura"
+    ],
+    "Proyecto de Ingeniería Aplicada I": [
+      "Análisis de Problemas de Ingeniería"
+    ],
+    "Ingeniería Comercial": [
+      "Modelos de Sistemas Logísticos"
+    ],
+    "Proyecto de Ingeniería Aplicada II": [
+      "Proyecto de Ingeniería Aplicada I",
+      "Simulación de Procesos"
+    ],
+    "Gerencia Estratégica": [
+      "Ingeniería Financiera",
+      "Ingeniería Comercial"
+    ]
+  },
   "Ingeniería Mecatrónica": {
     "Cálculo II": [
       "Cálculo I"
@@ -1077,6 +1769,135 @@ export const prerequisitosGenerados = {
     ],
     "Proyecto Integrador de Mecatrónica II": [
       "Proyecto Integrador de Mecatrónica I"
+    ]
+  },
+  "Marketing": {
+    "Estadística Empresarial I": [
+      "Estadística Básica para los Negocios"
+    ],
+    "Herramientas Informáticas para la Gestión I": [
+      "Economía y Empresa"
+    ],
+    "Costos y Presupuestos": [
+      "Contabilidad General"
+    ],
+    "Sociología del Consumidor": [
+      "Antropología del Consumidor"
+    ],
+    "Procesos de Marketing": [
+      "Antropología del Consumidor"
+    ],
+    "Estadística Empresarial II": [
+      "Estadística Empresarial I"
+    ],
+    "Administración Empresarial y Marketing": [
+      "Economía y Empresa"
+    ],
+    "Microeconomía": [
+      "Economía y Empresa"
+    ],
+    "Estadística Aplicada al Marketing": [
+      "Estadística Empresarial II"
+    ],
+    "Consumidor y Experiencia del Cliente": [
+      "Sociología del Consumidor"
+    ],
+    "Elaboración de Estados Financieros": [
+      "Costos y Presupuestos",
+      "Introducción a las Finanzas"
+    ],
+    "Administración de Canales de Distribución": [
+      "Procesos de Marketing"
+    ],
+    "Gestión de Producto y Marca": [
+      "Procesos de Marketing"
+    ],
+    "Macroeconomía": [
+      "Microeconomía"
+    ],
+    "Política y Fijación de Precios": [
+      "Macroeconomía"
+    ],
+    "Operaciones Logísticas de Marketing": [
+      "Administración de Canales de Distribución"
+    ],
+    "Investigación Cuantitativa de Mercados": [
+      "Estadística Aplicada al Marketing"
+    ],
+    "Publicidad y Medios": [
+      "Gestión de Producto y Marca"
+    ],
+    "Branding": [
+      "Gestión de Producto y Marca"
+    ],
+    "Investigación Cualitativa de Mercados": [
+      "Consumidor y Experiencia del Cliente"
+    ],
+    "Ciencia de Datos Aplicado al Marketing": [
+      "Estadística Aplicada al Marketing"
+    ],
+    "Dirección Estratégica de Marketing": [
+      "Investigación Cuantitativa de Mercados"
+    ],
+    "Finanzas para Marketing": [
+      "Elaboración de Estados Financieros"
+    ],
+    "Marketing Social": [
+      "Investigación Cuantitativa de Mercados"
+    ],
+    "Comunicación e Imagen Corporativa": [
+      "Publicidad y Medios"
+    ],
+    "Transformación Digital y Marketing": [
+      "Publicidad y Medios"
+    ],
+    "Endomarketing y Gestión de Personas": [
+      "Administración Empresarial y Marketing"
+    ],
+    "Gerencia de Ventas": [
+      "Operaciones Logísticas de Marketing"
+    ],
+    "Ética y Sostenibilidad Empresarial": [
+      "Endomarketing y Gestión de Personas"
+    ],
+    "Herramientas Estratégicas de Negocios y Marketing": [
+      "Dirección Estratégica de Marketing"
+    ],
+    "Métodos y Técnicas de Evaluación de Proyectos": [
+      "Finanzas para Marketing"
+    ],
+    "E-commerce": [
+      "Transformación Digital y Marketing"
+    ],
+    "Trade Marketing y Merchandising": [
+      "Gerencia de Ventas"
+    ],
+    "Marketing de Servicios": [
+      "Marketing Social"
+    ],
+    "Seminario de Investigación en Marketing I": [
+      "Herramientas Estratégicas de Negocios y Marketing"
+    ],
+    "Analítica de Datos": [
+      "Transformación Digital y Marketing"
+    ],
+    "Negociación Comercial": [
+      "Comunicación e Imagen Corporativa"
+    ],
+    "Seminario de Investigación en Marketing II": [
+      "Seminario de Investigación en Marketing I"
+    ],
+    "Estrategias de Marketing Internacional": [
+      "Trade Marketing y Merchandising"
+    ],
+    "Estrategia de Relacionamiento y Fidelización": [
+      "Herramientas Estratégicas de Negocios y Marketing"
+    ],
+    "Plan de Marketing": [
+      "Métodos y Técnicas de Evaluación de Proyectos"
+    ],
+    "Planeamiento Estratégico Publicitario": [
+      "Publicidad y Medios"
     ]
   },
   "Negocios Internacionales": {

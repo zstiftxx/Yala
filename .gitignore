@@ -10,3 +10,6 @@ graphify-out/
 
 # Config local de Claude Code
 .claude/
+
+# Cache de Python (scripts/extraer_mallas.py)
+__pycache__/

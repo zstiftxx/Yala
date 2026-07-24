@@ -84,13 +84,29 @@ Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los
 ## Datos de mallas (`frontend/src/data/`)
 - **`cursosGenerales.js`** — ciclos 1-2 (generales) de las 14 carreras. **Fuente de verdad de los generales**: aunque un PDF viejo difiera, se conservan estos.
 - **`mallaCurricular.js`** — fusiona generales (1-2) + `cursosAvanzados` (ciclo 3+) + `prerequisitos`. Ing. de Sistemas está escrito a mano; el resto se importa de `mallasGeneradas.js`.
-- **`mallasGeneradas.js`** — generado automáticamente desde los PDF oficiales (con pdfplumber). Solo ciclos 3+, sin electivos, traducciones al inglés recortadas.
-  - **Ni los PDF ni el script de extracción están en el repo** (verificado 2026-07-23: no hay ningún `.pdf` ni `.py`). O sea que las 8 mallas generadas **no son reproducibles**: si la ULima actualiza un plan, hay que rehacer el trabajo desde cero, y no queda registro de qué PDF salió cada dato. Si aparecen los PDF, conviene versionarlos junto al script.
-  - Las 5 carreras pendientes **no tienen datos en este archivo**, ni siquiera parciales: se descartaron al generar. No hay nada que corregir ahí; hace falta la fuente.
+- **`mallasGeneradas.js`** — **generado, no editar a mano.** Solo ciclos 3+, sin electivos, traducciones al inglés recortadas. Se regenera con:
+  ```
+  python scripts/extraer_mallas.py
+  ```
+  Requiere `pdfplumber`. Reescribe el archivo entero, pero **conserva las carreras que ya estaban** y solo pisa las que extrae (`CARRERAS` en el script), así que agregar una carrera no borra las demás.
+
+### `scripts/extraer_mallas.py` y `scripts/pdf/`
+Los 5 PDF de los que salieron Ing. Industrial, Derecho, Marketing, Comunicaciones e Ing. Ambiental **están versionados** en `scripts/pdf/` (2026-07-23, ~1 MB, bajados de `ulima.edu.pe`). Las otras 8 carreras se generaron antes sin dejar rastro de su fuente: si hay que rehacerlas, toca volver a bajar el PDF y sumar la carrera a `CARRERAS`.
+
+El script **no parsea el texto plano del PDF, usa las coordenadas de cada palabra**, y ese es el punto: una fila de la tabla ocupa hasta tres líneas, y la mitad de un nombre largo cae *arriba* de la línea con los números mientras que un segundo prerrequisito cae *abajo*. En texto plano las dos se ven idénticas; lo que las distingue es en qué columna están. Cosas que costaron y conviene no volver a romper:
+- Los fragmentos se clasifican **enteros por donde empiezan**, no palabra por palabra: un nombre largo se estira más allá de su columna y sus últimas palabras caen sobre la de requisitos sin dejar de ser el nombre.
+- Las palabras de una línea se ordenan **por `x0`**: pdfplumber a veces devuelve la marca de la columna TA al final, porque su `top` difiere un par de píxeles, y se pegaba al requisito.
+- Los fragmentos sueltos se cuelgan solo de filas **de la misma página**: `top` se mide desde el borde de cada página.
+- El corte de las electivas busca el **título** "Asignaturas electivas", no la palabra en la página: el resumen de créditos la nombra al pie de la página que trae los últimos ciclos obligatorios, y marcar la página entera se comía los ciclos 9 y 10.
+- Un prerrequisito no resuelto **se descarta y se imprime**; nunca se adivina. Cada corrida deja el listado a la vista.
 
 ### Estado de las mallas
-- **Completas (9)**: Ing. de Sistemas + Administración, Arquitectura, Contabilidad y Finanzas, Economía, Ing. Civil, Ing. Mecatrónica, Negocios Internacionales, Psicología.
-- **Pendientes (5)** — muestran solo ciclos 1-2 hasta tener mallas actualizadas: **Ing. Industrial** (PDF con columnas rotas), **Marketing** (electivos colados), **Comunicaciones** (muy corta), **Derecho** (mal mapeada), **Ing. Ambiental** (un ciclo de electivos de más).
+**Las 14 carreras tienen malla completa** (verificado 2026-07-23 cargando `obtenerMallaCompleta` desde el navegador). Derecho y Psicología llegan al ciclo 12; el resto a 9 o 10.
+
+Dos salvedades que vienen de la fuente, no del código:
+- **Comunicaciones queda rala a propósito** (37 cursos en 9 ciclos, contra ~52 de las demás): de ciclo 5 en adelante su plan es casi todo electivo, con 3-4 obligatorios por ciclo. No es una extracción incompleta, es la forma real del plan. Ese era el "muy corta" por el que se había descartado antes.
+- **`cursosGenerales.js` quedó atrasado respecto de los planes 2025+**, que renombraron los generales (`Precálculo` → `Matemática Básica`, `Fundamentos de Economía` → `Economía y Empresa`, y `Matemática Aplicada a los Negocios` ya no lleva I/II). Como ese archivo es la fuente de verdad de los ciclos 1-2, 7 prerrequisitos de ciclo 3 que apuntan a un general renombrado **se descartan** para no dejar referencias muertas. El script los imprime aparte, y esa lista mide cuánto se atrasó el archivo. Actualizarlo es una decisión aparte: `estadoCursos` guarda los cursos **por nombre**, así que renombrarlos les borra el avance a quienes ya marcaron esos cursos.
+- El PDF de Ing. Ambiental tiene dos erratas de la propia ULima: una fila marca el obligatorio con un cero (`0`) en vez de `O` (el script lo acepta a propósito), y el curso "Formulación y Diseño de Proyectos **Sostenibles**" aparece citado como "...Proyectos **Ambientales**" en el prerrequisito de Gestión de Proyectos. Ese prerrequisito se descarta: son el mismo curso a la vista, pero corregirlo sería inventar.
 
 ## Convenciones
 - Mensajes de commit en español, cuerpo en ASCII plano (sin tildes en el cuerpo). Commitear solo cuando el usuario lo pide.
@@ -98,7 +114,7 @@ Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los
 - **No inventar datos curriculares** (códigos de curso, créditos): se omitieron a propósito. Los PDF sí traen códigos/créditos reales si más adelante se quieren agregar.
 
 ## Notificaciones / Feedback / Reportar
-- **`Notificaciones.jsx`** (`/notificaciones`): notificaciones **derivadas del estado local** (no hay backend de notificaciones). Genera: bienvenida, "completa tu perfil" (si falta nombre/carrera/ciclo), "N cursos en curso", y "malla en construcción" si la carrera **no** está en `carrerasConMallaCompleta` (antes era una lista escrita a mano, con las tildes mal, y ese aviso nunca salía para las dos ingenierías). Estado leído/no-leído en `localStorage['notif_leidas']`. La campana del topbar también lleva aquí.
+- **`Notificaciones.jsx`** (`/notificaciones`): notificaciones **derivadas del estado local** (no hay backend de notificaciones). Genera: bienvenida, "completa tu perfil" (si falta nombre/carrera/ciclo), "N cursos en curso", y "malla en construcción" si la carrera **no** está en `carrerasConMallaCompleta` (antes era una lista escrita a mano, con las tildes mal, y ese aviso nunca salía para las dos ingenierías). Desde 2026-07-23 las 14 carreras tienen malla, así que ese aviso ya no le sale a nadie; el código se deja porque vuelve a servir si se agrega una carrera nueva. Estado leído/no-leído en `localStorage['notif_leidas']`. La campana del topbar también lleva aquí.
 - **`Feedback.jsx`** (`/feedback`) y **`Reportar.jsx`** (`/reportar`): formularios (tipo + mensaje) que **insertan en Supabase** (tablas `feedback` y `reportes`). Manejan sin sesión → limpian localStorage y van a `/`; si la tabla no existe (código `42P01`) muestran aviso pidiendo correr el SQL. Reportar guarda también la `carrera`.
 - **SQL de las tablas** en `supabase/tablas.sql` — **ya corrido (2026-07-20)**. Crea `feedback` y `reportes` con RLS (insert/select solo del propio `user_id`; tú ves todo desde el Table editor, que ignora RLS).
 - **`supabase/materiales.sql`** — tabla `materiales` (apuntes/resúmenes/exámenes por curso) para el objetivo central de la app. `user_metadata` no sirve para esto: es por usuario, no compartido. Material = **enlace**, no archivo subido (sin Storage por ahora). El curso se identifica por nombre, igual que `estadoCursos`. **Ya corrido (2026-07-20)**: verificado que existe, que el `select` anónimo devuelve vacío en vez de error y que el `insert` anónimo lo rechaza la RLS con `42501`.
@@ -115,6 +131,6 @@ Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los
 ## Pendientes / ideas futuras
 - **Probar el flujo real con sesión** ahora que las tablas existen: enviar un feedback, un reporte, y subir/borrar un material desde `/curso/:curso`.
 - Decidir el nombre de la app.
-- Mallas actualizadas de las 5 carreras pendientes.
+- **Decidir si se actualiza `cursosGenerales.js`** a los generales de los planes 2025+ (ver "Estado de las mallas"): recupera 7 prerrequisitos, pero renombrar cursos le borra el avance a quien ya los marcó.
 - **Verificar en el navegador las pantallas con sesión** (Mis Cursos, detalle de curso, Perfil, onboarding): el preview no puede pasar el login. El rediseño se verificó inyectando el markup equivalente en el DOM, lo que valida el CSS pero **no** que cada componente lo produzca igual. El mapa curricular no se revisó en pantalla.
 - Opcional: agregar códigos/créditos reales a las tarjetas.
