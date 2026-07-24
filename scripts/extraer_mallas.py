@@ -101,7 +101,10 @@ def limpiar(texto):
     # El renglon de totales de cada ciclo va tan pegado a la ultima fila que a
     # veces cae dentro de ella; se corta aqui en vez de descartar la linea.
     texto = re.split(r"TOTAL DE CR[ÉE]DITOS", texto, flags=re.IGNORECASE)[0]
-    texto = texto.strip(" .-—–")
+    # El asterisco es una llamada a nota al pie ("se programan grabaciones
+    # fuera del horario"), no parte del nombre. Ademas el PDF cita esos cursos
+    # sin el cuando son prerrequisito de otro, asi que dejarlo no emparejaria.
+    texto = texto.strip(" .-—–*")
     texto = re.sub(r"\s+\d{4,6}$", "", texto)  # codigo que se cuela al final
     if "/" in texto:
         texto = texto.split("/")[0].strip()

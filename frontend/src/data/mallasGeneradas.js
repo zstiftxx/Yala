@@ -137,7 +137,7 @@ export const cursosAvanzadosGenerados = {
     ],
     "6": [
       "Técnicas de Investigación",
-      "Taller de Video*",
+      "Taller de Video",
       "Comunicación y Experiencia de Usuario"
     ],
     "7": [
@@ -995,7 +995,7 @@ export const prerequisitosGenerados = {
     "Técnicas de Investigación": [
       "Sociedad y Comunicación"
     ],
-    "Taller de Video*": [
+    "Taller de Video": [
       "Técnicas Audiovisuales",
       "Narrativa Audiovisual"
     ],
