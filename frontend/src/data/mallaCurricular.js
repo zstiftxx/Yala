@@ -138,15 +138,34 @@ export function cicloDeCurso(carrera, curso) {
   return encontrado ? Number(encontrado[0]) : null;
 }
 
+// Cursos de ciclo 3+ que no tienen prerrequisitos declarados. NO es lo mismo
+// que "no tiene prerrequisitos": los PDF oficiales no siempre los traen y la
+// cobertura varia mucho por carrera (0% de huecos en Economia, ~49% en
+// Mecatronica). En ciclos 1-2 la ausencia si es real, por eso quedan fuera.
+//
+// Vive aca, y no en cada pantalla, porque el Dashboard y el mapa curricular
+// tienen que estar de acuerdo sobre que cursos son un hueco de datos.
+export function sinDatosDePrerequisito(carrera) {
+  const malla = obtenerMallaCompleta(carrera);
+  if (!malla) return new Set();
+
+  const prereqs = obtenerPrerequisitos(carrera);
+  const set = new Set();
+  Object.entries(malla).forEach(([ciclo, cursos]) => {
+    if (Number(ciclo) < 3) return;
+    cursos.forEach((curso) => {
+      if (!(prereqs[curso] || []).length) set.add(curso);
+    });
+  });
+  return set;
+}
+
 // Cursos que el alumno puede llevar ahora: los que aun no aprobo ni esta llevando
 // y cuyos prerrequisitos estan todos aprobados.
 //
-// Ojo con los ciclos 3+ sin prerrequisitos declarados: los PDF oficiales no
-// siempre los traen y la cobertura varia mucho por carrera (0% de huecos en
-// Economia, ~49% en Mecatronica). Para esos no podemos afirmar que esten
-// habilitados sin inventar data curricular, asi que se devuelven aparte en
-// `sinDatos` en vez de colarse entre los disponibles. En ciclos 1-2 la ausencia
-// de prerrequisitos si es real.
+// Los que no tienen el dato se devuelven aparte en `sinDatos` en vez de colarse
+// entre los disponibles: no podemos afirmar que esten habilitados sin inventar
+// data curricular.
 //
 // Devuelve { disponibles, sinDatos }, ambos [{ curso, ciclo }] ordenados por
 // ciclo y luego alfabeticamente.
@@ -155,6 +174,7 @@ export function cursosDisponibles(carrera, estadoCursos = {}) {
   if (!malla) return { disponibles: [], sinDatos: [] };
 
   const prereqs = obtenerPrerequisitos(carrera);
+  const huecos = sinDatosDePrerequisito(carrera);
   const aprobado = (curso) => estadoCursos[curso] === 'aprobado';
 
   const disponibles = [];
@@ -166,10 +186,9 @@ export function cursosDisponibles(carrera, estadoCursos = {}) {
       const estado = estadoCursos[curso];
       if (estado === 'aprobado' || estado === 'en_curso') return;
 
-      const lista = prereqs[curso] || [];
-      if (!lista.length && n >= 3) {
+      if (huecos.has(curso)) {
         sinDatos.push({ curso, ciclo: n });
-      } else if (lista.every(aprobado)) {
+      } else if ((prereqs[curso] || []).every(aprobado)) {
         disponibles.push({ curso, ciclo: n });
       }
     });

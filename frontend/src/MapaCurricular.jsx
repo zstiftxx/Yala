@@ -3,13 +3,17 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import Sidebar from './Sidebar.jsx';
 import { useUser } from './useUser';
-import { obtenerMallaCompleta, obtenerPrerequisitos } from './data/mallaCurricular';
+import { obtenerMallaCompleta, obtenerPrerequisitos, sinDatosDePrerequisito } from './data/mallaCurricular';
 
 export default function MapaCurricular() {
   const { carrera: carreraGuardada, estadoCursos, cambiarEstadoCurso } = useUser();
   const carrera = carreraGuardada || 'Tu carrera';
   const malla = useMemo(() => obtenerMallaCompleta(carrera), [carrera]);
   const prereqs = useMemo(() => obtenerPrerequisitos(carrera), [carrera]);
+  // Sin esto, un curso sin flechas se ve igual si no tiene prerrequisitos que
+  // si no tenemos el dato, y son cosas muy distintas para quien se guia por el
+  // mapa para decidir que llevar.
+  const sinDatos = useMemo(() => sinDatosDePrerequisito(carrera), [carrera]);
   const ciclos = malla ? Object.keys(malla).map(Number).sort((a, b) => a - b) : [];
 
   const [seleccionado, setSeleccionado] = useState(null);
@@ -143,6 +147,7 @@ export default function MapaCurricular() {
   const claseCurso = (curso) => {
     const estado = (estadoCursos[curso] || 'no_cursado').replace('_', '-');
     let cls = `malla-curso ${estado}`;
+    if (sinDatos.has(curso)) cls += ' sin-datos';
     if (seleccionado === curso) cls += ' sel';
     if (relacionados && !relacionados.has(curso)) cls += ' dim';
     return cls;
@@ -261,8 +266,13 @@ export default function MapaCurricular() {
                     }}
                     className={claseCurso(curso)}
                     onClick={(e) => { e.stopPropagation(); setSeleccionado((prev) => (prev === curso ? null : curso)); }}
+                    title={sinDatos.has(curso) ? `${curso} - no tenemos sus prerrequisitos` : curso}
+                    aria-label={sinDatos.has(curso) ? `${curso}, sin datos de prerrequisito` : undefined}
                   >
                     {curso}
+                    {/* El borde punteado solo no alcanza: quien no lo distinga
+                        se queda sin la pista de que aca falta un dato. */}
+                    {sinDatos.has(curso) && <span className="malla-sin-dato" aria-hidden="true">?</span>}
                   </div>
                 ))}
               </div>
@@ -273,6 +283,9 @@ export default function MapaCurricular() {
             <span><i className="dot aprobado" /> Aprobado</span>
             <span><i className="dot en-curso" /> En curso</span>
             <span><i className="dot no-cursado" /> No cursado</span>
+            {sinDatos.size > 0 && (
+              <span><i className="dot sin-datos" /> Sin datos de prerrequisito ({sinDatos.size})</span>
+            )}
             <span className="leyenda-flecha">→ prerrequisito · toca un curso para ver su camino</span>
             {/* Solo visible en movil: ahi el mapa nunca entra entero y sin
                 aviso no es obvio que se pueda arrastrar de lado. */}

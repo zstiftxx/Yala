@@ -469,6 +469,15 @@ a.curso-enlace:hover { color: var(--shell-accent-fuerte); }
 .malla-curso.aprobado { background: var(--shell-green-bg); border-color: var(--shell-green-text); color: var(--shell-green-text); }
 .malla-curso.en-curso { background: var(--shell-blue-bg); border-color: var(--shell-blue-text); color: var(--shell-blue-text); }
 .malla-curso.no-cursado { background: var(--shell-surface); color: var(--shell-text-muted); }
+/* Un curso sin flechas se veia igual si no tiene prerrequisitos que si no
+   tenemos el dato. El borde punteado marca la diferencia sin inventar un color
+   nuevo, y el "?" la dice sin depender de que se distinga el borde. */
+.malla-curso.sin-datos { position: relative; border-style: dashed; }
+.malla-sin-dato {
+  position: absolute; top: 2px; right: 4px;
+  font-size: var(--fs-xs); font-weight: 700; line-height: 1;
+  color: var(--shell-text-muted);
+}
 .malla-curso.dim { opacity: 0.18; }
 .malla-curso.sel { box-shadow: 0 0 0 2px var(--shell-accent); opacity: 1; }
 
@@ -501,6 +510,7 @@ a.curso-enlace:hover { color: var(--shell-accent-fuerte); }
 .malla-leyenda .dot.aprobado { background: var(--shell-green-bg); border-color: var(--shell-green-text); }
 .malla-leyenda .dot.en-curso { background: var(--shell-blue-bg); border-color: var(--shell-blue-text); }
 .malla-leyenda .dot.no-cursado { background: var(--shell-surface); }
+.malla-leyenda .dot.sin-datos { background: var(--shell-surface); border-style: dashed; }
 .leyenda-desliza { display: none; }
 
 /* ---------- Formularios ---------- */
