@@ -216,7 +216,7 @@ export default function MapaCurricular() {
           <div
             className="malla-grid"
             ref={gridRef}
-            style={{ gridTemplateColumns: `repeat(${ciclos.length}, minmax(132px, 1fr))` }}
+            style={{ '--n-ciclos': ciclos.length }}
             onClick={() => setSeleccionado(null)}
             role="group"
             aria-label={`Mapa curricular de ${carrera}, ${ciclos.length} ciclos`}

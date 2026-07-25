@@ -97,7 +97,7 @@ export default function Sidebar({ active, children, sinNav }) {
 
       <div className="app-body">
         {!sinNav && !esMovil && <NavLateral active={active} onLogout={manejarLogout} />}
-        <main className={`main-area${conTabBar ? ' con-tabbar' : ''}`}>{children}</main>
+        <main className={`main-area${conTabBar ? ' con-tabbar' : ''}${sinNav ? ' main-area-full' : ''}`}>{children}</main>
       </div>
 
       {conTabBar && <TabBar active={active} />}

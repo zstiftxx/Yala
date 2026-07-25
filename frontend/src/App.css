@@ -118,6 +118,10 @@
   padding: var(--sp-6) var(--sp-8);
   max-width: 1180px;
 }
+/* El mapa curricular (sinNav) usa todo el ancho: con el tope de 1180px los
+   ciclos no cabian y el grid desbordaba en scroll aunque la pantalla fuera
+   ancha. Sin tope, las columnas se reparten el ancho disponible y entran. */
+.main-area.main-area-full { max-width: none; }
 
 /* ---------- Encabezado de pagina ---------- */
 .page-head {
@@ -447,6 +451,11 @@ a.curso-enlace:hover { color: var(--shell-accent-fuerte); }
 .malla-grid {
   position: relative;
   display: grid;
+  /* En desktop las columnas se encogen (minmax 0) para que TODOS los ciclos
+     quepan sin scroll. En movil el minimo legible de 132px las obliga a
+     deslizarse (ver la media query mas abajo). El numero de ciclos entra por
+     --n-ciclos desde el JSX. */
+  grid-template-columns: repeat(var(--n-ciclos, 6), minmax(0, 1fr));
   gap: var(--sp-8) 36px;
   align-items: start;
   padding-bottom: var(--sp-4);
@@ -762,6 +771,10 @@ textarea.form-input { resize: vertical; }
      cancela el padding del main-area y el padding propio lo devuelve por
      dentro, para que la primera y la ultima columna no queden pegadas. */
   .malla-grid {
+    /* En movil las columnas recuperan su ancho minimo legible y el mapa se
+       desliza en horizontal: "que entre todo" en un telefono con 10 ciclos
+       significaba columnas de 30px. */
+    grid-template-columns: repeat(var(--n-ciclos, 6), minmax(132px, 1fr));
     margin-inline: calc(var(--sp-4) * -1);
     padding-inline: var(--sp-4);
   }
