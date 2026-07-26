@@ -65,7 +65,7 @@ Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los
 - **`.page-head`** (con `.page-head-texto` / `.page-head-acciones`) reemplazó al viejo `.topbar` de las páginas.
 
 ## Rutas
-`/` Login · `/carrera` onboarding de carrera · `/home` Dashboard · `/perfil` · `/mis-cursos` · `/curso/:curso` · `/mapa-curricular` · `/notificaciones` · `/feedback` · `/reportar`.
+`/` Login · `/carrera` onboarding de carrera · `/home` Dashboard · `/perfil` · `/mis-cursos` · `/curso/:curso` · `/asistente` · `/mapa-curricular` · `/notificaciones` · `/feedback` · `/reportar`.
 
 ## Estructura clave
 - **`Sidebar.jsx`** = shell de la app (topbar + nav + contenido); prop `sinNav` oculta el nav lateral (lo usa el mapa curricular).
@@ -128,7 +128,30 @@ Dos salvedades que vienen de la fuente, no del código:
   - La policy de update deja que el autor toque `aprobado` en lo suyo, y es intencional. Para pasar a aprobación previa haría falta `revoke update (aprobado) ... from authenticated`, porque RLS filtra filas y no columnas.
 - Se llega a un curso desde `/mis-cursos` (catálogo con buscador) o desde el panel del mapa curricular.
 
+## Pantalla del asistente (`/asistente`, 2026-07-26)
+
+- **`Asistente.jsx`** — subir PDF/imagen (arrastrar o clic), escribir la pregunta, ver la respuesta y el contador de cuota. Habla **solo** con `asistente.js`; no llama a `supabase.functions.invoke` por su cuenta.
+  - El **límite diario lo decide la Edge Function** (`LIMITE_DIARIO_IA`), no el navegador: hasta la primera respuesta el contador dice "llevas N consultas hoy" y recién después "te quedan X de N". No hardcodear el 10 en el front.
+  - El `<input type="file">` **no lleva `hidden`**: así queda fuera del recorrido del tabulador y con teclado no se puede abrir el selector. Se tapa con `.input-archivo` (1px, opacity 0) y la zona se ilumina con `:focus-within`.
+  - Tres botones de sugerencia rellenan el textarea. La pantalla en blanco es el problema real de un asistente: nadie sabe qué pedirle a un examen viejo.
+  - Aviso de privacidad fijo bajo la zona de subida. Mientras el proveedor sea Gemini gratis, Google puede usar el material para entrenar y **revisores humanos pueden leerlo** (ver `supabase/functions/README.md`).
+  - Desde `/curso/:curso` hay un botón "Practicar con IA" que pasa el curso por `?curso=`.
+- **`RespuestaIA.jsx`** — Markdown ligero + fórmulas **KaTeX**. Decidido KaTeX y no texto plano: en física/circuitos una respuesta llena de `\frac` y `\Omega` en crudo es ilegible.
+  - **Renderizador propio, sin react-markdown/remark-math/rehype-katex.** Dos razones: son tres paquetes más para negritas, listas y títulos; y la respuesta **no es confiable** (sale de un modelo que acaba de leer un PDF que subió alguien). Aquí todo se convierte en **nodos de React**, nunca en HTML; lo único que pasa por `dangerouslySetInnerHTML` es la salida de KaTeX, que con `trust: false` (su default) no emite enlaces ni `\includegraphics`. No relajar eso.
+  - Soporta: títulos, párrafos, listas, tablas, citas, código, `$…$`, `$$…$$`, `\(…\)`, `\[…\]`. **No** soporta a propósito: HTML crudo, imágenes y enlaces.
+  - Las citas (`>`) se agregaron después de ver la respuesta real: el modelo transcribe el enunciado del material en una cita antes de resolverlo, y sin soporte quedaban los `>` a la vista.
+  - **El regex inline se construye en cada llamada, no es una constante de módulo.** `enLinea()` es recursiva (una negrita puede llevar una fórmula dentro) y un regexp con `g` comparte `lastIndex`: la llamada de adentro lo dejaba en 0 y el bucle de afuera empezaba de nuevo — bucle infinito con cualquier `**negrita**`. Pasó, se detectó renderizando en Node.
+  - El `$` que abre no puede ir seguido de espacio ni el que cierra ir precedido de espacio: sin eso "cuesta $50 y sobran $8" se compone como fórmula.
+- **KaTeX va en un chunk aparte**: `App.jsx` carga `Asistente` con `lazy()`. Son ~270 KB (82 KB gzip) que solo paga quien entra a esta pantalla; el bundle principal se queda en 550 KB.
+- **CORS: la Edge Function tuvo que redesplegarse** (2026-07-26). Solo permitía `authorization, content-type` en el preflight, pero `supabase.functions.invoke` agrega `x-client-info` y `apikey`, así que el navegador bloqueaba la petición **antes de que saliera** — la app daba un error genérico mientras que el `fetch` a mano del README (que no manda esas cabeceras) funcionaba perfecto. La señal para distinguirlo: el contador de `usadas` no sube. Detalle en [`supabase/functions/README.md`](supabase/functions/README.md).
+- **Verificado en pantalla con sesión real (2026-07-26)**: consulta sin archivo y consulta con imagen (el modelo transcribió el enunciado del PNG y lo resolvió), claro y oscuro, 375px sin desborde horizontal (la tabla se desliza en su propia caja), contador pasando de "llevas N" a "te quedan 5 de 10", y la tab bar con los 7 ítems sin recortes.
+
 ## Pendientes / ideas futuras
+- **Asistente de estudio + repositorio de ejercicios reales** (idea de 2026-07-24, ver [`docs/asistente-estudio.md`](docs/asistente-estudio.md)): un asistente con IA que genera práctica y la explica a partir de material real subido por el alumno; como subproducto va llenando/filtrando/clasificando un repositorio de ejercicios reales de la ULima (el "2x1"). El gancho es el asistente, el foso es el corpus. La IA nunca crea contenido "de verdad": solo filtra y ordena lo subido.
+  - **Los dos bloqueadores se cerraron el 2026-07-26.** (1) El LLM: Gemini en capa gratuita, por presupuesto; el proveedor es intercambiable por variable de entorno. (2) Cómo entra el material: el archivo va en base64 dentro de la petición, **sin pasar por Storage**.
+  - **La tubería está viva y verificada de punta a punta**: ver [`supabase/functions/README.md`](supabase/functions/README.md). Navegador → sesión → cuota diaria → modelo → respuesta.
+  - **Verificado con un examen real** (EE2 de Física para Sistemas, 9 páginas): el modelo **lee e interpreta las figuras** del PDF, no solo el texto. Es el riesgo que podía tumbar el producto y quedó descartado — en ese examen 5 de 7 problemas dicen "en la figura" y son irresolubles sin el dibujo (los valores 120Ω/40Ω/5Ω no están escritos en ninguna parte, solo dentro de la imagen). Costo medido: ~5,100 tokens de entrada por el PDF completo.
+  - **La pantalla ya existe** (2026-07-26): ver "Pantalla del asistente" más abajo. Falta la parte del *repositorio*: hoy el material subido se manda al modelo y se descarta, no queda guardado ni clasificado.
 - **Probar el flujo real con sesión** ahora que las tablas existen: enviar un feedback, un reporte, y subir/borrar un material desde `/curso/:curso`.
 - Decidir el nombre de la app.
 - **Decidir si se actualiza `cursosGenerales.js`** a los generales de los planes 2025+ (ver "Estado de las mallas"): recupera 7 prerrequisitos, pero renombrar cursos le borra el avance a quien ya los marcó.

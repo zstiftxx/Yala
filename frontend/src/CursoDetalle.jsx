@@ -12,7 +12,7 @@ import {
   normalizarUrl,
 } from './materiales';
 import EstadoCurso from './EstadoCurso.jsx';
-import { ArrowLeft, ExternalLink, Plus, Trash2, FileText, X } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Plus, Trash2, FileText, X, Sparkles } from 'lucide-react';
 
 const FILTROS = [{ valor: 'todos', etiqueta: 'Todos' }, ...TIPOS_MATERIAL];
 
@@ -67,6 +67,11 @@ export default function CursoDetalle() {
           </div>
         </div>
         <div className="page-head-acciones">
+          {/* El curso viaja en la URL para que el asistente ya sepa de que
+              materia le estan hablando sin que haya que elegirlo otra vez. */}
+          <Link to={`/asistente?curso=${encodeURIComponent(nombreCurso)}`} className="btn">
+            <Sparkles size={16} /> Practicar con IA
+          </Link>
           <EstadoCurso
             curso={nombreCurso}
             estado={estado}
@@ -91,6 +96,11 @@ function Materiales({ curso }) {
   const [error, setError] = useState(null);
   const [filtro, setFiltro] = useState('todos');
   const [abierto, setAbierto] = useState(false);
+  // CSS solo puede animar la ENTRADA de un elemento nuevo al DOM; la salida
+  // (borrar un material) React la hace de una, sin darle tiempo a nada. Por
+  // eso estos ids se guardan un momento nada mas para que el item se pinte
+  // con la clase "saliendo" y corra su animacion antes de sacarlo de la lista.
+  const [saliendo, setSaliendo] = useState(() => new Set());
 
   const manejarError = useCallback(
     (err) => {
@@ -123,8 +133,22 @@ function Materiales({ curso }) {
   };
 
   const eliminar = async (id) => {
+    // Si el sistema pide reduced-motion, se saca de una -- nada de esperar
+    // una animacion que de todos modos no se va a ver.
+    const prefiereMovimiento = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefiereMovimiento) {
+      setSaliendo((prev) => new Set(prev).add(id));
+      await new Promise((resolver) => setTimeout(resolver, 220)); // ver .saliendo en App.css
+    }
+
     const previos = materiales;
     setMateriales((lista) => lista.filter((m) => m.id !== id)); // optimista
+    setSaliendo((prev) => {
+      const siguiente = new Set(prev);
+      siguiente.delete(id);
+      return siguiente;
+    });
+
     const { error: err } = await borrarMaterial(id);
     if (err) {
       setMateriales(previos);
@@ -189,7 +213,7 @@ function Materiales({ curso }) {
       {visibles.length > 0 && (
         <div className="list">
           {visibles.map((m) => (
-            <div key={m.id} className="list-item material">
+            <div key={m.id} className={`list-item material${saliendo.has(m.id) ? ' saliendo' : ''}`}>
               <div className="material-info">
                 <a
                   href={m.url}

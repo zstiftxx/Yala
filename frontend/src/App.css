@@ -713,6 +713,129 @@ textarea.form-input { resize: vertical; }
 .auth-msg.info { background: var(--shell-blue-bg); color: var(--shell-blue-text); border: 1px solid var(--shell-blue-text); }
 :root[data-theme='dark'] .auth-msg.error { background: #3a1a1a; color: #f87171; border-color: #7f1d1d; }
 
+/* ---------- Asistente de estudio ---------- */
+.cuota-ia {
+  font-size: var(--fs-sm); font-weight: 600;
+  color: var(--shell-gray-text);
+  background: var(--shell-gray-bg);
+  border-radius: var(--r-full);
+  padding: 6px var(--sp-3);
+}
+
+/* Zona de subida. Es un <label>: el clic en cualquier parte abre el selector,
+   y arrastrar el archivo encima cae en el mismo sitio. */
+.zona-archivo {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-1);
+  padding: var(--sp-6) var(--sp-4);
+  border: 1.5px dashed var(--shell-border);
+  border-radius: var(--r-md);
+  background: var(--shell-surface-2);
+  text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.zona-archivo:hover, .zona-archivo.encima {
+  border-color: var(--shell-accent);
+  background: var(--shell-accent-bg);
+}
+.zona-archivo:focus-within {
+  border-color: var(--shell-accent);
+  box-shadow: 0 0 0 3px var(--shell-accent-bg);
+}
+.zona-archivo svg { color: var(--shell-accent-fuerte); }
+.zona-archivo-titulo { font-weight: 600; font-size: var(--fs-base); }
+.zona-archivo-sub { font-size: var(--fs-sm); color: var(--shell-text-muted); }
+/* Invisible pero enfocable: `hidden` o display:none lo sacarian del recorrido
+   del tabulador. */
+.input-archivo { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+.archivo-elegido {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--shell-border); border-radius: var(--r-md);
+  background: var(--shell-surface-2);
+}
+.archivo-elegido > svg { color: var(--shell-accent-fuerte); flex-shrink: 0; }
+.archivo-datos { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.archivo-nombre {
+  font-weight: 600; font-size: var(--fs-base);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.archivo-peso { font-size: var(--fs-xs); color: var(--shell-text-muted); }
+
+.nota-privacidad {
+  display: flex; align-items: flex-start; gap: var(--sp-2);
+  margin: var(--sp-3) 0 var(--sp-5);
+  font-size: var(--fs-sm); color: var(--shell-text-muted);
+}
+.nota-privacidad svg { flex-shrink: 0; margin-top: 3px; }
+
+.sugerencias { margin-bottom: var(--sp-3); }
+.area-pregunta { min-height: 96px; line-height: 1.55; }
+
+.asistente-envio {
+  display: flex; align-items: flex-end; gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+.curso-opcional { flex: 1; min-width: 0; }
+.girando { animation: girar 1s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.respuesta-card { margin-top: var(--sp-5); }
+.respuesta-pie {
+  margin: var(--sp-5) 0 0; padding-top: var(--sp-3);
+  border-top: 1px solid var(--shell-border);
+  font-size: var(--fs-sm); color: var(--shell-text-muted);
+}
+.esqueleto {
+  height: 12px; margin-top: var(--sp-3);
+  border-radius: var(--r-full);
+  background: var(--shell-surface-2);
+}
+.esqueleto.corto { width: 62%; }
+
+/* ---------- Respuesta del asistente (ver RespuestaIA.jsx) ---------- */
+.ia-respuesta { font-size: var(--fs-base); line-height: 1.65; }
+.ia-respuesta > :first-child { margin-top: 0; }
+/* pre-wrap conserva los saltos de linea que el modelo pone a proposito dentro
+   de un mismo parrafo (un enunciado con sus datos, uno por linea). */
+.ia-parrafo { margin: 0 0 var(--sp-3); white-space: pre-wrap; }
+.ia-titulo { margin: var(--sp-5) 0 var(--sp-2); font-size: var(--fs-lg); }
+.ia-lista { margin: 0 0 var(--sp-3); padding-left: var(--sp-5); }
+.ia-lista li { margin-bottom: var(--sp-2); white-space: pre-wrap; }
+.ia-separador { border: 0; border-top: 1px solid var(--shell-border); margin: var(--sp-5) 0; }
+/* El modelo transcribe el enunciado del material en una cita antes de
+   resolverlo: conviene que se distinga de su propia explicacion. */
+.ia-cita {
+  margin: 0 0 var(--sp-3);
+  padding: var(--sp-2) 0 var(--sp-2) var(--sp-4);
+  border-left: 3px solid var(--shell-accent);
+  color: var(--shell-text-muted);
+}
+.ia-cita > :last-child { margin-bottom: 0; }
+.ia-codigo {
+  background: var(--shell-surface-2); border-radius: 6px;
+  padding: 1px 5px; font-size: 0.9em;
+}
+.ia-bloque-codigo {
+  background: var(--shell-surface-2); border: 1px solid var(--shell-border);
+  border-radius: var(--r-sm); padding: var(--sp-3);
+  overflow-x: auto; font-size: var(--fs-sm); margin: 0 0 var(--sp-3);
+}
+.ia-tabla-scroll { overflow-x: auto; margin: 0 0 var(--sp-4); }
+.ia-tabla { border-collapse: collapse; font-size: var(--fs-sm); }
+.ia-tabla th, .ia-tabla td {
+  border: 1px solid var(--shell-border);
+  padding: var(--sp-2) var(--sp-3); text-align: left;
+}
+.ia-tabla th { background: var(--shell-surface-2); }
+
+/* KaTeX trae su propio tamano (1.21em) y al lado del texto se ve enorme. */
+.ia-respuesta .katex { font-size: 1.05em; }
+/* Un desarrollo largo no puede ensanchar la pagina: se desliza en su caja. */
+.ia-respuesta .katex-display { overflow-x: auto; overflow-y: hidden; margin: 0; padding: 2px 0; }
+.ia-formula-bloque { display: block; margin: var(--sp-4) 0; }
+
 /* ---------- Tab bar movil ---------- */
 .tabbar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
@@ -782,6 +905,8 @@ textarea.form-input { resize: vertical; }
 
   .form-fila { flex-direction: column; gap: var(--sp-4); }
   .materiales-head .btn { width: 100%; justify-content: center; }
+  .asistente-envio { flex-direction: column; align-items: stretch; }
+  .asistente-envio .btn { width: 100%; justify-content: center; }
   .auth-card { padding: var(--sp-6) var(--sp-5); }
 }
 

@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from './useUser';
 import { useEsMovil } from './useEsMovil';
 import { useTema } from './useTema';
-import { LayoutGrid, Bell, BookOpen, MessageSquare, User, LogOut, Moon, Sun, AlertTriangle } from 'lucide-react';
+import { LayoutGrid, Bell, BookOpen, MessageSquare, User, LogOut, Moon, Sun, AlertTriangle, Sparkles } from 'lucide-react';
 
 // Fuente unica de la navegacion: el nav lateral y la tab bar movil leen de aqui,
 // asi no se desincronizan cuando se agrega una ruta.
@@ -11,6 +11,7 @@ import { LayoutGrid, Bell, BookOpen, MessageSquare, User, LogOut, Moon, Sun, Ale
 const ITEMS_NAV = [
   { clave: 'dashboard', a: '/home', icono: LayoutGrid, texto: 'Dashboard', corto: 'Inicio' },
   { clave: 'mis-cursos', a: '/mis-cursos', icono: BookOpen, texto: 'Mis Cursos', corto: 'Cursos' },
+  { clave: 'asistente', a: '/asistente', icono: Sparkles, texto: 'Asistente', corto: 'IA' },
   { clave: 'notificaciones', a: '/notificaciones', icono: Bell, texto: 'Notificaciones', corto: 'Avisos' },
   { clave: 'feedback', a: '/feedback', icono: MessageSquare, texto: 'Feedback', corto: 'Feedback' },
   { clave: 'reportar', a: '/reportar', icono: AlertTriangle, texto: 'Reportar', corto: 'Reportar' },

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useUser } from './useUser';
 import Login from './Login.jsx';
@@ -12,6 +13,11 @@ import Feedback from './Feedback.jsx';
 import Reportar from './Reportar.jsx';
 import NoEncontrado from './NoEncontrado.jsx';
 import './App.css';
+
+// El asistente arrastra KaTeX (~270 KB sin comprimir) y es la unica pantalla
+// que lo necesita. Cargandolo aparte, quien entra al login o al dashboard no
+// descarga el compositor de formulas.
+const Asistente = lazy(() => import('./Asistente.jsx'));
 
 // La sesion real vive en Supabase; localStorage['user'] es solo un espejo que
 // puede quedar viejo (sesion expirada, logout en otra pestania, alguien que
@@ -37,6 +43,16 @@ function App() {
       <Route path="/mapa-curricular" element={<RequireAuth><MapaCurricular /></RequireAuth>} />
       <Route path="/mis-cursos" element={<RequireAuth><MisCursos /></RequireAuth>} />
       <Route path="/curso/:curso" element={<RequireAuth><CursoDetalle /></RequireAuth>} />
+      <Route
+        path="/asistente"
+        element={
+          <RequireAuth>
+            <Suspense fallback={<div className="auth-page">Cargando...</div>}>
+              <Asistente />
+            </Suspense>
+          </RequireAuth>
+        }
+      />
       <Route path="/notificaciones" element={<RequireAuth><Notificaciones /></RequireAuth>} />
       <Route path="/feedback" element={<RequireAuth><Feedback /></RequireAuth>} />
       <Route path="/reportar" element={<RequireAuth><Reportar /></RequireAuth>} />
