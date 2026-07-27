@@ -64,6 +64,17 @@ Carácter buscado: **cálido y estudiantil**, no panel administrativo. Todos los
 - **`.curso-fila` + `.lista-filas`** — el patrón de lista de cursos. Filas separadas por una línea, no tarjetas dentro de tarjetas.
 - **`.page-head`** (con `.page-head-texto` / `.page-head-acciones`) reemplazó al viejo `.topbar` de las páginas.
 
+### Animaciones (2026-07-27, portadas del trabajo del colaborador)
+
+Todas viven en un solo bloque al final de `App.css`, después de los media queries de tamaño. Los easings (`--ease-suave`, `--ease-resorte`) se declaran en un `:root` propio ahí mismo, **fuera** del media query, porque las transiciones de hover también los usan.
+
+- **Todo el movimiento ambiental va bajo `@media (prefers-reduced-motion: no-preference)`**: quien pide menos movimiento no ve nada. Lo único que queda fuera son las transiciones de hover/click (`.card`, `.icon-btn`, `.avatar`), que son cortas y responden a una acción, no a que la página cargue. Al agregar una animación nueva, meterla dentro del media query salvo que sea de ese tipo.
+- **Casi todo se dispara solo, sin estado ni JS.** El truco es que Sidebar y TabBar se **remontan en cada navegación** (son parte del shell de cada página), así que el ítem que llega con la clase `active` ya nace con ella: eso permite usar una `animation` en vez de una `transition` — que necesitaría un cambio de estado sobre un nodo que ya existía — y funciona igual en táctil que en desktop, sin depender del hover. Lo mismo con los íconos del toggle de tema y del ojo de la contraseña: `Sol`/`Luna` y `Eye`/`EyeOff` son componentes distintos, así que React los remonta solo.
+- **Donde eso no alcanza, la única pieza en JS es una `key`**: el panel del mapa (`key={seleccionado}`) y el mensaje del login (`key={tipo-texto}`) se remontan al cambiar, para que su animación vuelva a correr. En `Login.jsx` los dos fragmentos `<>` pasaron a ser `<div className="auth-form-switch">` para tener dónde colgarla.
+- **La única que sí necesita JS de verdad es la salida de un material borrado** (`.list-item.saliendo` + el `setTimeout(220)` en `eliminar()` de `CursoDetalle.jsx`): React saca el nodo del DOM al instante, así que sin ese retraso la regla nunca alcanzaría a correr. Los dos números tienen que coincidir.
+- Las cascadas (`:nth-child`) llegan hasta el 5.º elemento y de ahí en adelante comparten un delay tope, para que una lista larga no tarde en aparecer.
+- El temblor (`tiembla`) es **solo para `.auth-msg.error`**: es una señal, no se usa para buenas noticias.
+
 ## Rutas
 `/` Login · `/carrera` onboarding de carrera · `/home` Dashboard · `/perfil` · `/mis-cursos` · `/curso/:curso` · `/asistente` · `/mapa-curricular` · `/notificaciones` · `/feedback` · `/reportar`.
 
