@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { faltaLaTabla, sesionInvalida } from './erroresSupabase';
+import { faltaLaTabla, sesionInvalida, sinPermiso } from './erroresSupabase';
 
 // Acceso a la tabla `materiales` (ver supabase/materiales.sql). Vive aparte de
 // la pagina para que CursoDetalle solo se ocupe de pintar: aca se centraliza el
@@ -22,6 +22,9 @@ export function etiquetaTipo(valor) {
 function traducirError(error) {
   if (sesionInvalida(error)) {
     return { sesion: true, mensaje: 'Tu sesion expiro.' };
+  }
+  if (sinPermiso(error)) {
+    return { mensaje: 'No tienes permiso para hacer esto.' };
   }
   if (faltaLaTabla(error)) {
     return {

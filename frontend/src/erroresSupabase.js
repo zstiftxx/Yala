@@ -18,6 +18,18 @@ export function faltaLaTabla(error) {
   );
 }
 
+// Si las policies de RLS rechazan la operacion, Postgres devuelve '42501'
+// (insufficient_privilege), o PostgREST responde 401/403. Sin esto, el aviso
+// que veia el usuario era el mensaje crudo de Postgres.
+export function sinPermiso(error) {
+  return (
+    error?.code === '42501' ||
+    error?.status === 401 ||
+    error?.status === 403 ||
+    /row-level security/i.test(error?.message || '')
+  );
+}
+
 // La sesion vencida llega como mensaje, no como codigo estable.
 export function sesionInvalida(error) {
   const texto = (error?.message || '').toLowerCase();
