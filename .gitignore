@@ -13,3 +13,6 @@ graphify-out/
 
 # Cache de Python (scripts/extraer_mallas.py)
 __pycache__/
+
+# Base para integrar el trabajo del colaborador (no versionar)
+.colab-baseline/
