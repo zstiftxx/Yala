@@ -31,6 +31,24 @@ function Login() {
     setVerPass(false);
   };
 
+  // Supabase Auth responde en ingles y con frases pensadas para quien
+  // desarrolla ("Invalid login credentials"). Se traducen las que puede ver
+  // el usuario; cualquier otra cae al mensaje original en vez de a un texto
+  // generico, para no esconder informacion al depurar.
+  const mensajeDeError = (error) => {
+    const mensaje = error?.message || '';
+    const mapa = [
+      [/already registered|already.*exists|user_already_exists/i, 'Ese correo ya tiene una cuenta.'],
+      [/invalid.*email/i, 'El correo no es valido.'],
+      [/password.*(least|short|weak)/i, 'La contraseña debe tener al menos 6 caracteres.'],
+      [/invalid.*credentials|invalid_credentials/i, 'Correo o contraseña incorrectos.'],
+      [/user.*not.*found/i, 'No existe una cuenta con ese correo.'],
+      [/rate.*limit|too many requests/i, 'Demasiados intentos. Espera un momento y vuelve a intentar.'],
+    ];
+    const encontrado = mapa.find(([regex]) => regex.test(mensaje));
+    return encontrado ? encontrado[1] : mensaje || 'Ocurrio un error inesperado.';
+  };
+
   // Registro (sign up): pantalla propia con nombre y confirmacion de contrasena
   const manejarRegistro = async (e) => {
     e?.preventDefault();
@@ -63,7 +81,7 @@ function Login() {
     });
 
     if (error) {
-      setMensaje({ tipo: 'error', texto: error.message });
+      setMensaje({ tipo: 'error', texto: mensajeDeError(error) });
     } else if (data && data.session) {
       // Solo hay sesion real si la confirmacion por correo esta desactivada
       setMensaje({ tipo: 'success', texto: 'Cuenta creada!' });
@@ -88,7 +106,7 @@ function Login() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setMensaje({ tipo: 'error', texto: error.message });
+      setMensaje({ tipo: 'error', texto: mensajeDeError(error) });
       setCargando(false);
     } else if (data && data.user) {
       setMensaje({ tipo: 'success', texto: 'Ingreso exitoso! Redirigiendo...' });
@@ -114,7 +132,7 @@ function Login() {
         </div>
 
         {esRegistro ? (
-          <>
+          <div key="registro" className="auth-form-switch">
             <h2 className="auth-title">Crea tu cuenta</h2>
             <p className="auth-subtitle">Reg&iacute;strate para seguir tu avance de carrera</p>
 
@@ -216,9 +234,9 @@ function Login() {
             <button className="auth-btn ghost" type="button" onClick={() => cambiarModo('login')} disabled={cargando}>
               <ArrowLeft size={18} /> Ya tengo una cuenta
             </button>
-          </>
+          </div>
         ) : (
-          <>
+          <div key="login" className="auth-form-switch">
             <h2 className="auth-title">Bienvenido de vuelta</h2>
             <p className="auth-subtitle">Ingresa con tu correo universitario</p>
 
@@ -273,10 +291,16 @@ function Login() {
             <button className="auth-btn ghost" type="button" onClick={() => cambiarModo('registro')} disabled={cargando}>
               <UserPlus size={18} /> Crear una cuenta nueva
             </button>
-          </>
+          </div>
         )}
 
-        {mensaje && <p className={`auth-msg ${mensaje.tipo}`}>{mensaje.texto}</p>}
+        {/* La key cambia con el texto para que un mensaje nuevo remonte el
+            nodo y su animacion (el temblor del error) se vuelva a disparar. */}
+        {mensaje && (
+          <p key={`${mensaje.tipo}-${mensaje.texto}`} className={`auth-msg ${mensaje.tipo}`}>
+            {mensaje.texto}
+          </p>
+        )}
       </div>
     </div>
   );

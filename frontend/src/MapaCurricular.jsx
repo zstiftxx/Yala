@@ -187,7 +187,9 @@ export default function MapaCurricular() {
       {malla ? (
         <>
           {seleccionado && (
-            <div className="malla-panel">
+            /* La key hace que el panel se remonte al pasar de un curso a
+               otro, y asi su animacion de entrada corre en cada seleccion. */
+            <div key={seleccionado} className="malla-panel">
               <div className="malla-panel-curso">
                 <strong>{seleccionado}</strong>
                 <Link to={`/curso/${encodeURIComponent(seleccionado)}`} className="malla-panel-link">

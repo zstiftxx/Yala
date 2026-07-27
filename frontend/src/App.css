@@ -917,3 +917,229 @@ textarea.form-input { resize: vertical; }
 @media (max-width: 400px) {
   .estado-btn { padding: 6px 10px; gap: var(--sp-1); }
 }
+
+
+/* ======================================================================
+   Animaciones (portadas del trabajo de colaboracion)
+   Todo va bajo prefers-reduced-motion: no-preference -- quien pide menos
+   movimiento no ve nada de esto. Las variables --ease-* son locales a este
+   bloque; el resto de tokens sale de index.css.
+   ====================================================================== */
+:root {
+  --ease-suave: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-resorte: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+
+  @keyframes entra-arriba {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes entra-tenue {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes aparece-icono {
+    from { opacity: 0; transform: scale(.5) rotate(-25deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0); }
+  }
+  @keyframes respira {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .55; transform: scale(.85); }
+  }
+  /* Las barras de la espera. Sin esto se ven como tres rayas rotas: la
+     respuesta del modelo tarda lo suyo y hay que mostrar que sigue vivo. */
+  @keyframes latido {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .45; }
+  }
+  .esqueleto { animation: latido 1.4s ease-in-out infinite; }
+
+  /* Login <-> Registro: el bloque completo se vuelve a montar (ver key=
+     "login"/"registro" en Login.jsx), asi que esta animacion se dispara
+     sola en cada cambio de modo, sin JS extra. */
+  @keyframes auth-switch-entra {
+    from { opacity: 0; transform: translateY(6px) scale(.985); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  /* Alerta de error: un temblor corto que no repite ni se siente como un
+     efecto de sonido -- una sola pasada, sutil. */
+  @keyframes tiembla {
+    10%, 90% { transform: translateX(-1px); }
+    20%, 80% { transform: translateX(2px); }
+    30%, 50%, 70% { transform: translateX(-4px); }
+    40%, 60% { transform: translateX(4px); }
+  }
+  /* Algo que se "abre" (formulario de material, panel de la malla): crece
+     desde un poco mas chico y mas arriba, no aparece de la nada. */
+  @keyframes entra-crece {
+    from { opacity: 0; transform: scale(.94) translateY(-6px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Cada pagina (Sidebar se monta de nuevo por ruta) entra con un fade + un
+     desplazamiento minimo hacia arriba. Sutil a proposito: 10px y medio
+     segundo, nada de rebote ni de deslizamientos largos. */
+  .main-area, .auth-card {
+    animation: entra-arriba .5s var(--ease-suave) both;
+  }
+
+  /* Las tarjetas entran en cascada, no todas juntas -- asi el ojo lee un
+     orden en vez de un flash general. Se limita a las primeras: pasado eso
+     ya no aporta, solo demora. */
+  .cards > .card,
+  .card {
+    animation: entra-tenue .4s var(--ease-suave) both;
+  }
+  .cards > .card:nth-child(1) { animation-delay: .03s; }
+  .cards > .card:nth-child(2) { animation-delay: .09s; }
+  .cards > .card:nth-child(3) { animation-delay: .15s; }
+
+  /* Filas de listas (materiales, notificaciones, cursos): mismo patron,
+     con un tope de delay para que una lista larga no tarde en aparecer. */
+  .list-item, .curso-fila {
+    animation: entra-arriba .35s var(--ease-suave) both;
+  }
+  .list > .list-item:nth-child(2),
+  .lista-filas > .curso-fila:nth-child(2) { animation-delay: .04s; }
+  .list > .list-item:nth-child(3),
+  .lista-filas > .curso-fila:nth-child(3) { animation-delay: .08s; }
+  .list > .list-item:nth-child(4),
+  .lista-filas > .curso-fila:nth-child(4) { animation-delay: .12s; }
+  .list > .list-item:nth-child(5),
+  .lista-filas > .curso-fila:nth-child(5) { animation-delay: .16s; }
+  .list > .list-item:nth-child(n+6),
+  .lista-filas > .curso-fila:nth-child(n+6) { animation-delay: .2s; }
+
+  /* El icono del toggle de tema (Sol/Luna) es un elemento de React distinto
+     en cada click, asi que esta animacion se vuelve a disparar sola cada
+     vez -- no hace falta estado ni JS extra para el "crossfade". Lo mismo
+     aplica al ojo de mostrar/ocultar contraseña: Eye/EyeOff son componentes
+     distintos, asi que React ya los remonta solo con el toggle. */
+  .icon-btn svg, .auth-theme-toggle svg, .auth-eye svg {
+    animation: aparece-icono .35s var(--ease-resorte) both;
+  }
+
+  /* ---------- Login / Registro ---------- */
+  /* El bloque entero (titulo, campos, boton) entra junto, y cada campo
+     se suma en cascada -- igual que las tarjetas del dashboard, para que
+     el cambio de modo se sienta como una transicion, no un parpadeo. */
+  .auth-form-switch {
+    animation: auth-switch-entra .4s var(--ease-suave) both;
+  }
+  .auth-form-switch .auth-field {
+    animation: entra-arriba .4s var(--ease-suave) both;
+  }
+  .auth-form-switch .auth-field:nth-child(1) { animation-delay: .04s; }
+  .auth-form-switch .auth-field:nth-child(2) { animation-delay: .09s; }
+  .auth-form-switch .auth-field:nth-child(3) { animation-delay: .14s; }
+  .auth-form-switch .auth-field:nth-child(4) { animation-delay: .19s; }
+  .auth-form-switch .auth-field:nth-child(5) { animation-delay: .24s; }
+  .auth-form-switch .auth-btn,
+  .auth-form-switch .auth-divider {
+    animation: entra-tenue .4s var(--ease-suave) both;
+    animation-delay: .28s;
+  }
+
+  /* El mensaje de error tiembla una vez al aparecer; exito/info solo entran
+     con un fade -- el temblor es una señal, no se usa para buenas noticias. */
+  .auth-msg {
+    animation: entra-arriba .3s var(--ease-suave) both;
+  }
+  .auth-msg.error {
+    animation: entra-arriba .3s var(--ease-suave) both, tiembla .4s ease-out .28s both;
+  }
+
+  /* ---------- Abrir un formulario o un panel ---------- */
+  .form-material {
+    animation: entra-crece .35s var(--ease-suave) both;
+    transform-origin: top center;
+  }
+  .malla-panel {
+    animation: entra-crece .3s var(--ease-suave) both;
+    transform-origin: top left;
+  }
+
+  /* El punto de "no leida" respira en vez de quedarse estatico: llama la
+     atencion sin ser una alarma. */
+  .notif-punto {
+    animation: respira 2.4s ease-in-out infinite;
+  }
+
+  /* ---------- Cambio de apartado (nav lateral + tabbar) ----------
+     Sidebar/TabBar se vuelven a montar en cada navegacion (son parte del
+     shell de cada pagina), asi que el item que llega con la clase "active"
+     ya nace con ella puesta. Eso permite usar una animacion normal (no una
+     transicion, que necesita un cambio de estado en un nodo que ya existia)
+     y que se dispare sola cada vez que cambias de seccion, sin depender de
+     pasar el mouse por encima -- por lo tanto se ve igual en touch/movil
+     que en desktop. */
+  @keyframes activo-entra {
+    from { opacity: 0; transform: translateX(-6px) scale(.94); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  @keyframes tab-icono-entra {
+    0%   { transform: scale(.7) translateY(3px); }
+    55%  { transform: scale(1.18) translateY(-2px); }
+    100% { transform: scale(1) translateY(0); }
+  }
+  @keyframes tab-fondo-entra {
+    from { opacity: 0; transform: scale(.5); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .sidebar nav li.active a {
+    animation: activo-entra .3s var(--ease-resorte) both;
+  }
+  .tabbar-item.active svg {
+    animation: tab-icono-entra .4s var(--ease-resorte) both;
+  }
+  .tabbar-item.active span {
+    animation: entra-tenue .35s var(--ease-suave) both;
+  }
+  .tabbar-item.active::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    width: 46px;
+    height: 30px;
+    border-radius: var(--r-full);
+    background: var(--shell-accent-bg);
+    animation: tab-fondo-entra .3s var(--ease-resorte) both;
+  }
+}
+
+/* Estas transiciones SI quedan aunque haya reduced-motion: son cambios de
+   estado (hover/click) cortos, no movimiento ambiental. */
+.card {
+  transition: transform .25s var(--ease-suave), box-shadow .25s var(--ease-suave);
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-md);
+}
+.curso-fila.enlace, .notif {
+  transition: background .18s var(--ease-suave), transform .18s var(--ease-suave);
+}
+.icon-btn, .avatar {
+  transition: background .15s, color .15s, transform .15s var(--ease-resorte);
+}
+.icon-btn:hover { transform: scale(1.08); }
+.icon-btn:active { transform: scale(.92); }
+.avatar:hover { transform: scale(1.06); }
+
+/* Salida de un material borrado (ver eliminar() en Materiales, CursoDetalle.jsx).
+   Esta animacion SI necesita JS: React saca el nodo del DOM al tiro cuando
+   cambia el estado, asi que sin el "saliendo" + setTimeout de alla, esta
+   regla nunca alcanzaria a correr. */
+@media (prefers-reduced-motion: no-preference) {
+  .list-item.saliendo {
+    animation: sale-lateral .22s var(--ease-suave) both;
+    pointer-events: none;
+  }
+  @keyframes sale-lateral {
+    from { opacity: 1; transform: translateX(0) scale(1); }
+    to   { opacity: 0; transform: translateX(14px) scale(.96); }
+  }
+}
